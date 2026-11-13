@@ -60,7 +60,7 @@ Ricorda di impostare le variabili `EXPO_PUBLIC_SUPABASE_*` anche negli
 
 ## Le domande
 
-`src/data/questions.ts` contiene un set iniziale di ~215 domande Vero/Falso scritte a mano e
+`src/data/questions.ts` contiene un set iniziale di ~210 domande Vero/Falso scritte a mano e
 distribuite sui 25 argomenti ministeriali, con spiegazioni per i casi più insidiosi.
 Il database ufficiale del Ministero conta circa 7.000 domande, molte con immagini dei segnali:
 per un uso reale conviene caricare il database completo nello stesso formato
