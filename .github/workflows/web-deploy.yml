@@ -1,0 +1,46 @@
+# Pubblica la versione web su EAS Hosting (Expo) a ogni modifica dell'app.
+# Richiede il secret EXPO_TOKEN. Avvio manuale: Actions → "Pubblica versione web" → Run workflow.
+name: Pubblica versione web
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [claude/patente-b-quiz-app-jdll3r]
+    paths:
+      - 'src/**'
+      - 'assets/**'
+      - 'app.json'
+      - 'package.json'
+      - '.env'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: web-deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Collega il progetto Expo
+        run: npx --yes eas-cli@latest init --non-interactive --force
+
+      - name: Esporta la versione web
+        run: npx expo export --platform web
+
+      - name: Pubblica su EAS Hosting
+        run: npx --yes eas-cli@latest deploy --prod --non-interactive
