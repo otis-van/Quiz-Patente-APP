@@ -1,0 +1,44 @@
+# Build personalizzata EAS: compila l'app iOS SENZA firma e carica un .ipa
+# da firmare in seguito (Signulous, AltStore, Sideloadly...).
+build:
+  name: iOS .ipa non firmato
+  steps:
+    - eas/checkout
+    - eas/install_node_modules
+    - eas/prebuild
+    - run:
+        name: Installa i CocoaPods
+        working_directory: ./ios
+        command: pod install
+    - run:
+        name: Compila (Release, senza firma)
+        command: |
+          set -eo pipefail
+          mkdir -p build
+          WS=$(ls -d ios/*.xcworkspace | head -1)
+          SCHEME=$(basename "$WS" .xcworkspace)
+          echo "Workspace: $WS  Scheme: $SCHEME"
+          xcodebuild \
+            -workspace "$WS" \
+            -scheme "$SCHEME" \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            -archivePath "$PWD/build/App.xcarchive" \
+            archive \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
+            > build/xcodebuild.log 2>&1 || { grep -E "error:|ARCHIVE FAILED" build/xcodebuild.log | head -50; tail -150 build/xcodebuild.log; exit 1; }
+          tail -5 build/xcodebuild.log
+    - run:
+        name: Crea il file .ipa
+        command: |
+          set -e
+          mkdir -p build/Payload
+          cp -R build/App.xcarchive/Products/Applications/*.app build/Payload/
+          cd build && zip -qry QuizPatenteB.ipa Payload
+          ls -lh QuizPatenteB.ipa
+    - eas/upload_artifact:
+        name: Carica il .ipa
+        inputs:
+          type: application-archive
+          path: build/QuizPatenteB.ipa

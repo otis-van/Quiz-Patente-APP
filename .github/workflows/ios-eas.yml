@@ -1,0 +1,65 @@
+# Compila l'.ipa iOS NON firmato sui Mac di Expo (EAS Build) e lo pubblica in una Release.
+# Richiede il secret EXPO_TOKEN. Avvio: Actions → "Build iOS con Expo (.ipa)" → Run workflow.
+name: Build iOS con Expo (.ipa)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ios-eas
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    env:
+      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Verifica account Expo
+        run: npx --yes eas-cli@latest whoami
+
+      - name: Collega il progetto Expo
+        run: npx --yes eas-cli@latest init --non-interactive --force
+
+      - name: Build iOS su EAS (attende la fine)
+        run: |
+          npx --yes eas-cli@latest build --platform ios --profile ios-unsigned \
+            --non-interactive --wait --json --message "GitHub run ${{ github.run_number }}" > eas-build.json
+          cat eas-build.json
+
+      - name: Scarica il .ipa
+        run: |
+          URL=$(node -e "const b=require('./eas-build.json');const x=Array.isArray(b)?b[0]:b;console.log(x.artifacts.applicationArchiveUrl||x.artifacts.buildUrl)")
+          echo "Artifact: $URL"
+          mkdir -p build
+          curl -fL "$URL" -o build/QuizPatenteB.ipa
+          ls -lh build/QuizPatenteB.ipa
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: QuizPatenteB-ipa
+          path: build/QuizPatenteB.ipa
+
+      - name: Pubblica nella Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ios-eas-${{ github.run_number }}
+          name: Quiz Patente B – iOS ${{ github.run_number }} (Expo)
+          prerelease: true
+          files: build/QuizPatenteB.ipa
+          body: |
+            File .ipa **non firmato**: firmalo e installalo con Signulous (o AltStore / Sideloadly).
+            Commit: ${{ github.sha }}
