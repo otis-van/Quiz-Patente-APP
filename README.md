@@ -28,7 +28,6 @@ sul telefono e continuare sul tablet.
 
 ```bash
 npm install
-cp .env.example .env.local   # facoltativo: serve solo per account e sincronizzazione
 npx expo start               # poi premi i (iOS), a (Android) o w (web), oppure scansiona il QR con Expo Go
 ```
 
@@ -36,7 +35,8 @@ npx expo start               # poi premi i (iOS), a (Android) o w (web), oppure 
 
 1. Crea un progetto gratuito su [supabase.com](https://supabase.com).
 2. In **SQL Editor** esegui `supabase/migrations/0001_progress.sql` (crea la tabella `progress` con Row Level Security: ogni utente vede solo i propri dati).
-3. In **Project Settings → API** copia *Project URL* e *anon public key* in `.env.local`:
+3. Il progetto Supabase dell'app è già configurato nel file `.env` (URL e chiave *anon*, entrambi pubblici).
+   Per usare un progetto diverso, in **Project Settings → API** copia *Project URL* e *anon public key* in `.env.local`, che ha la precedenza:
    ```
    EXPO_PUBLIC_SUPABASE_URL=https://xxxx.supabase.co
    EXPO_PUBLIC_SUPABASE_ANON_KEY=...
