@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import { useShallow } from 'zustand/react/shallow';
 
 import { DuoButton } from '@/components/DuoButton';
@@ -8,9 +8,11 @@ import { StatsBar } from '@/components/StatsBar';
 import { formatDateIt } from '@/lib/date';
 import { EXAM_MAX_ERRORS, EXAM_QUESTIONS, EXAM_SECONDS } from '@/lib/quiz';
 import { useProgress } from '@/store/progress';
-import { C, F } from '@/theme';
+import { F, makeStyles, useColors } from '@/theme';
 
 export default function ExamTab() {
+  const C = useColors();
+  const styles = useStyles();
   const exams = useProgress(useShallow((s) => s.exams));
   const passed = exams.filter((e) => e.passed).length;
   const last10 = exams.slice(0, 10);
@@ -58,7 +60,7 @@ export default function ExamTab() {
           <View key={e.id} style={styles.historyRow}>
             <Text style={{ fontSize: 26 }}>{e.passed ? '🎓' : '📚'}</Text>
             <View style={{ flex: 1 }}>
-              <Text style={[styles.historyTitle, { color: e.passed ? C.greenDark : C.redDark }]}>
+              <Text style={[styles.historyTitle, { color: e.passed ? C.greenText : C.redText }]}>
                 {e.passed ? 'Idoneo' : 'Non idoneo'} · {e.errors} {e.errors === 1 ? 'errore' : 'errori'}
               </Text>
               <Text style={styles.historyDate}>
@@ -73,6 +75,7 @@ export default function ExamTab() {
 }
 
 function Rule({ icon, text }: { icon: string; text: string }) {
+  const styles = useStyles();
   return (
     <View style={styles.rule}>
       <Text style={{ fontSize: 18 }}>{icon}</Text>
@@ -81,16 +84,18 @@ function Rule({ icon, text }: { icon: string; text: string }) {
   );
 }
 
-function StatBox({ label, value, color = C.text }: { label: string; value: string; color?: string }) {
+function StatBox({ label, value, color }: { label: string; value: string; color?: string }) {
+  const C = useColors();
+  const styles = useStyles();
   return (
     <View style={styles.statBox}>
-      <Text style={[styles.statValue, { color }]}>{value}</Text>
+      <Text style={[styles.statValue, { color: color ?? C.text }]}>{value}</Text>
       <Text style={styles.statLabel}>{label}</Text>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((C) => ({
   headerTitle: { fontFamily: F.black, fontSize: 20, color: C.text },
   hero: { marginTop: 16, borderWidth: 2, borderColor: C.grayLight, borderRadius: 20, padding: 20, alignItems: 'center', gap: 8 },
   heroTitle: { fontFamily: F.black, fontSize: 24, color: C.text },
@@ -110,4 +115,4 @@ const styles = StyleSheet.create({
   historyRow: { flexDirection: 'row', alignItems: 'center', gap: 12, borderWidth: 2, borderColor: C.grayLight, borderRadius: 16, padding: 12 },
   historyTitle: { fontFamily: F.bold, fontSize: 16 },
   historyDate: { fontFamily: F.regular, color: C.gray, fontSize: 13 },
-});
+}));

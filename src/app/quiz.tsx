@@ -1,16 +1,17 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { DuoButton } from '@/components/DuoButton';
 import { ProgressBar } from '@/components/ProgressBar';
+import { RoadSign } from '@/components/RoadSign';
 import { chapterById } from '@/data/chapters';
 import { Question } from '@/data/questions';
 import { haptic } from '@/lib/haptics';
 import { buildDaily, buildLesson, buildPractice, buildReview, QuizMode, xpForSession } from '@/lib/quiz';
 import { AnswerLog, mistakeIds, useProgress } from '@/store/progress';
-import { C, F, MAX_WIDTH } from '@/theme';
+import { F, MAX_WIDTH, makeStyles, useColors } from '@/theme';
 
 const PRAISE = ['Ottimo!', 'Perfetto!', 'Bravissimo!', 'Esatto!', 'Grande!', 'Continua così!'];
 
@@ -20,6 +21,8 @@ interface Item {
 }
 
 export default function QuizScreen() {
+  const C = useColors();
+  const styles = useStyles();
   const params = useLocalSearchParams<{ mode?: QuizMode; chapter?: string }>();
   const mode: QuizMode = params.mode ?? 'lesson';
   const chapterId = params.chapter ? Number(params.chapter) : undefined;
@@ -148,6 +151,11 @@ export default function QuizScreen() {
               {chapter ? ` · ${chapter.short.toUpperCase()}` : ''}
             </Text>
           )}
+          {current.q.sign && (
+            <View style={styles.signCard}>
+              <RoadSign id={current.q.sign} size={150} />
+            </View>
+          )}
           <View style={styles.questionRow}>
             <Text style={styles.mascot}>🚦</Text>
             <View style={styles.speech}>
@@ -173,16 +181,16 @@ export default function QuizScreen() {
       {checked ? (
         <View style={[styles.sheet, { backgroundColor: isCorrect ? C.greenLight : C.redLight }]}>
           <View style={styles.inner}>
-            <Text style={[styles.sheetTitle, { color: isCorrect ? C.greenDark : C.redDark }]}>
+            <Text style={[styles.sheetTitle, { color: isCorrect ? C.greenText : C.redText }]}>
               {isCorrect ? `✅ ${praise}` : '❌ Risposta corretta:'}
             </Text>
             {!isCorrect && (
-              <Text style={[styles.sheetBody, { color: C.redDark, fontFamily: F.bold }]}>
+              <Text style={[styles.sheetBody, { color: C.redText, fontFamily: F.bold }]}>
                 {current.q.answer ? 'VERO' : 'FALSO'}
               </Text>
             )}
             {current.q.explanation && (
-              <Text style={[styles.sheetBody, { color: isCorrect ? C.greenDark : C.redDark }]}>
+              <Text style={[styles.sheetBody, { color: isCorrect ? C.greenText : C.redText }]}>
                 {current.q.explanation}
               </Text>
             )}
@@ -213,14 +221,16 @@ function Choice({
   disabled: boolean;
   onPress: () => void;
 }) {
+  const C = useColors();
+  const styles = useStyles();
   const palette =
     state === 'right'
-      ? { border: C.green, bg: C.greenLight, fg: C.greenDark }
+      ? { border: C.green, bg: C.greenLight, fg: C.greenText }
       : state === 'wrong'
-        ? { border: C.red, bg: C.redLight, fg: C.redDark }
+        ? { border: C.red, bg: C.redLight, fg: C.redText }
         : selected
-          ? { border: '#84D8FF', bg: C.blueLight, fg: C.blueDark }
-          : { border: C.grayLight, bg: C.white, fg: C.text };
+          ? { border: C.blueBorder, bg: C.blueLight, fg: C.blueDark }
+          : { border: C.grayLight, bg: C.bg, fg: C.text };
   return (
     <Pressable disabled={disabled} onPress={onPress} accessibilityRole="button" accessibilityState={{ selected }}>
       {({ pressed }) => (
@@ -243,6 +253,7 @@ function Choice({
 }
 
 function Tile({ label, value, color }: { label: string; value: string; color: string }) {
+  const styles = useStyles();
   return (
     <View style={[styles.tile, { backgroundColor: color, borderColor: color }]}>
       <Text style={styles.tileLabel}>{label}</Text>
@@ -253,8 +264,8 @@ function Tile({ label, value, color }: { label: string; value: string; color: st
   );
 }
 
-const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: C.white },
+const useStyles = makeStyles((C) => ({
+  root: { flex: 1, backgroundColor: C.bg },
   inner: { width: '100%', maxWidth: MAX_WIDTH, alignSelf: 'center' },
   center: { alignItems: 'center', justifyContent: 'center', padding: 24 },
   topBar: { flexDirection: 'row', alignItems: 'center', gap: 14, paddingHorizontal: 16, paddingVertical: 12 },
@@ -263,6 +274,7 @@ const styles = StyleSheet.create({
   kicker: { fontFamily: F.black, fontSize: 13, letterSpacing: 0.6 },
   questionRow: { flexDirection: 'row', alignItems: 'flex-end', gap: 10 },
   mascot: { fontSize: 54 },
+  signCard: { alignSelf: 'center', padding: 14, borderRadius: 20, backgroundColor: C.grayBg, borderWidth: 2, borderColor: C.grayLight },
   speech: {
     flex: 1,
     borderWidth: 2,
@@ -291,6 +303,6 @@ const styles = StyleSheet.create({
   tiles: { flexDirection: 'row', gap: 10, marginTop: 28, width: '100%' },
   tile: { flex: 1, borderWidth: 2, borderRadius: 16, overflow: 'hidden' },
   tileLabel: { fontFamily: F.black, color: C.white, fontSize: 11, textAlign: 'center', paddingVertical: 4 },
-  tileBody: { backgroundColor: C.white, borderRadius: 14, paddingVertical: 14, alignItems: 'center' },
+  tileBody: { backgroundColor: C.bg, borderRadius: 14, paddingVertical: 14, alignItems: 'center' },
   tileValue: { fontFamily: F.black, fontSize: 17 },
-});
+}));

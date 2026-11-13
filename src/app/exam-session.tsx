@@ -1,15 +1,16 @@
 import { router } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
-import { Alert, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, Platform, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { DuoButton } from '@/components/DuoButton';
+import { RoadSign } from '@/components/RoadSign';
 import { chapterById } from '@/data/chapters';
 import { Question } from '@/data/questions';
 import { haptic } from '@/lib/haptics';
 import { buildExam, EXAM_MAX_ERRORS, EXAM_SECONDS } from '@/lib/quiz';
 import { useProgress } from '@/store/progress';
-import { C, F, MAX_WIDTH } from '@/theme';
+import { F, MAX_WIDTH, makeStyles, useColors } from '@/theme';
 
 const fmt = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 
@@ -25,6 +26,8 @@ function confirm(title: string, message: string, onOk: () => void) {
 }
 
 export default function ExamSession() {
+  const C = useColors();
+  const styles = useStyles();
   const [questions] = useState<Question[]>(buildExam);
   const [answers, setAnswers] = useState<(boolean | null)[]>(() => questions.map(() => null));
   const [index, setIndex] = useState(0);
@@ -95,7 +98,7 @@ export default function ExamSession() {
           Domanda {index + 1}/{questions.length}
         </Text>
         <View style={[styles.timer, left < 120 && { backgroundColor: C.redLight, borderColor: C.red }]}>
-          <Text style={[styles.timerText, left < 120 && { color: C.redDark }]}>⏱️ {fmt(left)}</Text>
+          <Text style={[styles.timerText, left < 120 && { color: C.redText }]}>⏱️ {fmt(left)}</Text>
         </View>
       </View>
 
@@ -121,6 +124,11 @@ export default function ExamSession() {
           <Text style={styles.kicker}>
             {ch.emoji} {ch.short.toUpperCase()}
           </Text>
+          {q.sign && (
+            <View style={styles.signCard}>
+              <RoadSign id={q.sign} size={150} />
+            </View>
+          )}
           <Text style={styles.question}>{q.text}</Text>
           <View style={styles.vfRow}>
             {[true, false].map((val) => {
@@ -131,7 +139,7 @@ export default function ExamSession() {
                     <View
                       style={[
                         styles.vf,
-                        sel && { borderColor: '#84D8FF', backgroundColor: C.blueLight },
+                        sel && { borderColor: C.blueBorder, backgroundColor: C.blueLight },
                         { borderBottomWidth: pressed ? 2 : 5, marginTop: pressed ? 3 : 0 },
                       ]}>
                       <Text style={[styles.vfLetter, sel && { color: C.blueDark }]}>{val ? 'V' : 'F'}</Text>
@@ -174,6 +182,8 @@ export default function ExamSession() {
 }
 
 function ExamResult({ questions, answers }: { questions: Question[]; answers: (boolean | null)[] }) {
+  const C = useColors();
+  const styles = useStyles();
   const wrong = questions.map((q, i) => ({ q, a: answers[i] })).filter(({ q, a }) => a !== q.answer);
   const passed = wrong.length <= EXAM_MAX_ERRORS;
   return (
@@ -195,10 +205,13 @@ function ExamResult({ questions, answers }: { questions: Question[]; answers: (b
                   <Text style={styles.wrongChapter}>
                     {chapterById(q.chapter).emoji} {chapterById(q.chapter).short}
                   </Text>
-                  <Text style={styles.wrongText}>{q.text}</Text>
+                  <View style={{ flexDirection: 'row', gap: 10, alignItems: 'center' }}>
+                    {q.sign && <RoadSign id={q.sign} size={56} />}
+                    <Text style={[styles.wrongText, { flex: 1 }]}>{q.text}</Text>
+                  </View>
                   <Text style={styles.wrongAnswer}>
-                    Tua risposta: <Text style={{ color: C.redDark }}>{a === null ? '—' : a ? 'VERO' : 'FALSO'}</Text> · Corretta:{' '}
-                    <Text style={{ color: C.greenDark }}>{q.answer ? 'VERO' : 'FALSO'}</Text>
+                    Tua risposta: <Text style={{ color: C.redText }}>{a === null ? '—' : a ? 'VERO' : 'FALSO'}</Text> · Corretta:{' '}
+                    <Text style={{ color: C.greenText }}>{q.answer ? 'VERO' : 'FALSO'}</Text>
                   </Text>
                   {q.explanation && <Text style={styles.wrongExpl}>{q.explanation}</Text>}
                 </View>
@@ -214,8 +227,8 @@ function ExamResult({ questions, answers }: { questions: Question[]; answers: (b
   );
 }
 
-const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: C.white },
+const useStyles = makeStyles((C) => ({
+  root: { flex: 1, backgroundColor: C.bg },
   inner: { width: '100%', maxWidth: MAX_WIDTH, alignSelf: 'center' },
   top: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12, gap: 14 },
   close: { fontSize: 24, color: C.gray, fontFamily: F.bold },
@@ -232,10 +245,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  cellAnswered: { backgroundColor: C.blueLight, borderColor: '#84D8FF' },
+  cellAnswered: { backgroundColor: C.blueLight, borderColor: C.blueBorder },
   cellCurrent: { backgroundColor: C.blue, borderColor: C.blueDark },
   cellText: { fontFamily: F.bold, color: C.gray, fontSize: 13 },
   kicker: { fontFamily: F.black, color: C.purple, fontSize: 13, letterSpacing: 0.6 },
+  signCard: { alignSelf: 'center', padding: 14, borderRadius: 20, backgroundColor: C.grayBg, borderWidth: 2, borderColor: C.grayLight },
   question: { fontFamily: F.bold, fontSize: 21, color: C.text, lineHeight: 30 },
   vfRow: { flexDirection: 'row', gap: 12 },
   vf: {
@@ -258,4 +272,4 @@ const styles = StyleSheet.create({
   wrongText: { fontFamily: F.bold, color: C.text, fontSize: 16, lineHeight: 22 },
   wrongAnswer: { fontFamily: F.bold, color: C.textLight, fontSize: 14 },
   wrongExpl: { fontFamily: F.regular, color: C.textLight, fontSize: 14, lineHeight: 20 },
-});
+}));

@@ -1,10 +1,11 @@
 import { Tabs } from 'expo-router/js-tabs';
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { C, F } from '@/theme';
+import { F, makeStyles, useColors } from '@/theme';
 
 function TabIcon({ emoji, focused }: { emoji: string; focused: boolean }) {
+  const styles = useStyles();
   return (
     <View style={[styles.icon, focused && styles.iconFocused]}>
       <Text style={{ fontSize: 24, opacity: focused ? 1 : 0.55 }}>{emoji}</Text>
@@ -13,6 +14,7 @@ function TabIcon({ emoji, focused }: { emoji: string; focused: boolean }) {
 }
 
 export default function TabsLayout() {
+  const C = useColors();
   const insets = useSafeAreaInsets();
   const tab = (title: string, emoji: string) => ({
     title,
@@ -26,6 +28,7 @@ export default function TabsLayout() {
         tabBarInactiveTintColor: C.gray,
         tabBarLabelStyle: { fontFamily: F.bold, fontSize: 11 },
         tabBarStyle: {
+          backgroundColor: C.bg,
           borderTopWidth: 2,
           borderTopColor: C.grayLight,
           height: 64 + insets.bottom,
@@ -41,7 +44,7 @@ export default function TabsLayout() {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((C) => ({
   icon: { width: 44, height: 34, borderRadius: 12, alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: 'transparent' },
-  iconFocused: { backgroundColor: C.blueLight, borderColor: '#84D8FF' },
-});
+  iconFocused: { backgroundColor: C.blueLight, borderColor: C.blueBorder },
+}));

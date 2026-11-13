@@ -1,20 +1,23 @@
 import { router } from 'expo-router';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 import { useShallow } from 'zustand/react/shallow';
 
 import { DuoButton } from '@/components/DuoButton';
 import { ProgressBar } from '@/components/ProgressBar';
+import { RoadSign } from '@/components/RoadSign';
 import { Screen } from '@/components/Screen';
 import { StatsBar } from '@/components/StatsBar';
 import { CHAPTERS } from '@/data/chapters';
 import { dayKey } from '@/lib/date';
 import { DAILY_SIZE } from '@/lib/quiz';
 import { mistakeIds, todayXp, useProgress } from '@/store/progress';
-import { C, F } from '@/theme';
+import { F, makeStyles, useColors } from '@/theme';
 
 const EMPTY: number[] = [];
 
 export default function DailyScreen() {
+  const C = useColors();
+  const styles = useStyles();
   const today = dayKey();
   const { doneToday, xp, goal, examsToday, mistakes } = useProgress(
     useShallow((s) => ({
@@ -74,6 +77,19 @@ export default function DailyScreen() {
         />
       </View>
 
+      <Pressable onPress={() => router.push('/signs')} style={{ marginTop: 12 }}>
+        {({ pressed }) => (
+          <View style={[styles.signsCard, { borderBottomWidth: pressed ? 2 : 5, marginTop: pressed ? 3 : 0 }]}>
+            <RoadSign id="stop" size={44} />
+            <View style={{ flex: 1 }}>
+              <Text style={[styles.quickTitle, { color: C.purple }]}>Dizionario dei segnali</Text>
+              <Text style={styles.quickSub}>Tutti i segnali illustrati, divisi per categoria</Text>
+            </View>
+            <Text style={styles.go}>›</Text>
+          </View>
+        )}
+      </Pressable>
+
       <Text style={styles.section}>Esercizi del giorno per argomento</Text>
       <Text style={styles.hint}>
         Ogni giorno {DAILY_SIZE} domande nuove per ciascuno dei 25 argomenti. Completati oggi: {doneToday.length}/25
@@ -109,6 +125,7 @@ export default function DailyScreen() {
 }
 
 function QuickCard(p: { emoji: string; title: string; subtitle: string; color: string; onPress: () => void }) {
+  const styles = useStyles();
   return (
     <Pressable onPress={p.onPress} style={{ flex: 1 }}>
       {({ pressed }) => (
@@ -122,7 +139,7 @@ function QuickCard(p: { emoji: string; title: string; subtitle: string; color: s
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((C) => ({
   headerTitle: { fontFamily: F.black, fontSize: 20, color: C.text },
   date: { fontFamily: F.bold, color: C.gray, fontSize: 15, marginTop: 16, textTransform: 'capitalize' },
   section: { fontFamily: F.black, fontSize: 21, color: C.text, marginTop: 22, marginBottom: 10 },
@@ -137,6 +154,7 @@ const styles = StyleSheet.create({
   chest: { fontSize: 28 },
   quickRow: { flexDirection: 'row', gap: 12, marginTop: 16 },
   quick: { borderWidth: 2, borderColor: C.grayLight, borderRadius: 16, padding: 14, gap: 4, minHeight: 130 },
+  signsCard: { flexDirection: 'row', alignItems: 'center', gap: 12, borderWidth: 2, borderColor: C.grayLight, borderRadius: 16, padding: 12 },
   quickTitle: { fontFamily: F.black, fontSize: 16 },
   quickSub: { fontFamily: F.regular, color: C.textLight, fontSize: 13 },
   row: {
@@ -149,10 +167,10 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 10,
   },
-  rowDone: { backgroundColor: '#FFF9E0', borderColor: '#FFE580' },
+  rowDone: { backgroundColor: C.yellowLight, borderColor: C.yellowBorder },
   rowIcon: { width: 46, height: 46, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
   rowKicker: { fontFamily: F.bold, color: C.gray, fontSize: 11, letterSpacing: 0.6 },
   rowTitle: { fontFamily: F.bold, color: C.text, fontSize: 16 },
   check: { fontFamily: F.black, color: C.yellowDark, fontSize: 24, paddingHorizontal: 8 },
   go: { fontFamily: F.black, color: C.gray, fontSize: 28, paddingHorizontal: 8 },
-});
+}));

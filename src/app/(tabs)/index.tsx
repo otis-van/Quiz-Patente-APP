@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 import { useShallow } from 'zustand/react/shallow';
 
 import { DuoButton } from '@/components/DuoButton';
@@ -10,12 +10,13 @@ import { StatsBar } from '@/components/StatsBar';
 import { Chapter, CHAPTERS, LESSONS_PER_CHAPTER } from '@/data/chapters';
 import { questionsOfChapter } from '@/data/questions';
 import { chapterMastery, useProgress } from '@/store/progress';
-import { C, F } from '@/theme';
+import { F, makeStyles } from '@/theme';
 
 const OFFSETS = [0, 48, 72, 48, 0, -48, -72, -48];
 const NODE_ICONS = ['★', '★', '★', '🏆'];
 
 export default function PathScreen() {
+  const styles = useStyles();
   const lessonsDone = useProgress((s) => s.lessonsDone);
   const next = CHAPTERS.find((c) => (lessonsDone[c.id] ?? 0) < LESSONS_PER_CHAPTER);
 
@@ -41,6 +42,7 @@ export default function PathScreen() {
 }
 
 function Unit({ chapter }: { chapter: Chapter }) {
+  const styles = useStyles();
   const ids = questionsOfChapter(chapter.id).map((q) => q.id);
   const { done, mastery } = useProgress(
     useShallow((s) => ({ done: s.lessonsDone[chapter.id] ?? 0, mastery: chapterMastery(s.questionStats, ids) })),
@@ -90,7 +92,7 @@ function Unit({ chapter }: { chapter: Chapter }) {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((C) => ({
   brand: { fontFamily: F.black, fontSize: 18, color: C.green },
   continueCard: {
     marginTop: 16,
@@ -126,4 +128,4 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.15)',
   },
   path: { alignItems: 'center', paddingVertical: 12 },
-});
+}));

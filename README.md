@@ -14,6 +14,9 @@ sul telefono e continuare sul tablet.
 | 📝 **Esame** | Simulazione fedele all'esame: 30 domande Vero/Falso da tutti gli argomenti, 20 minuti, idoneo con massimo 3 errori. Navigazione libera tra le domande, correzione finale e storico con indice di preparazione. |
 | 👤 **Profilo** | Account e stato di sincronizzazione, statistiche, grafico XP settimanale, obiettivo giornaliero. |
 | 📖 **Guida argomento** | Tutte le domande dell'argomento con risposta, spiegazione e livello di padronanza. |
+| 🛑 **Segnali illustrati** | Oltre 70 segnali disegnati in SVG (pericolo, divieto, obbligo, precedenza, indicazione, pannelli, semafori, segnaletica orizzontale) mostrati nelle domande "Il segnale raffigurato…" e nel *Dizionario dei segnali*. |
+| 🌙 **Tema scuro** | Automatico (segue il sistema), chiaro o scuro, da Profilo → Aspetto. |
+| ⏰ **Promemoria** | Notifica giornaliera all'orario scelto (Profilo → Promemoria). Non arriva se l'obiettivo del giorno è già raggiunto e ricorda la serie da non perdere. |
 
 ## Tecnologie
 
@@ -48,6 +51,13 @@ nell'app e 2 secondi dopo ogni modifica). Il cloud e il dispositivo vengono **un
 esercizi giornalieri ed esami vengono uniti, per ogni domanda vince il tentativo più recente.
 Così si può studiare offline su due dispositivi e ritrovare tutto al successivo collegamento.
 
+## Promemoria e notifiche
+
+I promemoria sono notifiche locali (`expo-notifications`), quindi non serve alcun server: vengono
+programmati sul dispositivo per i 14 giorni successivi e riprogrammati a ogni apertura dell'app
+e dopo ogni sessione. Le notifiche programmate **non funzionano in Expo Go su Android**: per provarle
+serve una development build (`npx eas-cli@latest build --profile development`).
+
 ## Pubblicare su App Store e Google Play
 
 ```bash
@@ -60,11 +70,15 @@ Ricorda di impostare le variabili `EXPO_PUBLIC_SUPABASE_*` anche negli
 
 ## Le domande
 
-`src/data/questions.ts` contiene un set iniziale di ~210 domande Vero/Falso scritte a mano e
-distribuite sui 25 argomenti ministeriali, con spiegazioni per i casi più insidiosi.
+`src/data/questions.ts` contiene un set iniziale di ~270 domande Vero/Falso scritte a mano e
+distribuite sui 25 argomenti ministeriali, con spiegazioni per i casi più insidiosi;
+115 sono accompagnate da un segnale illustrato (campo `sign`, vedi `src/components/RoadSign.tsx`).
+
+Per aggiungere un segnale basta aggiungere una voce a `SIGNS` in `RoadSign.tsx` (disegno SVG su una
+griglia 100×100) e indicarne l'id nella domanda.
 Il database ufficiale del Ministero conta circa 7.000 domande, molte con immagini dei segnali:
 per un uso reale conviene caricare il database completo nello stesso formato
-(`{ id, chapter, text, answer, explanation?, image? }`). L'ID di ogni domanda deve restare stabile,
+(`{ id, chapter, text, answer, explanation?, sign? }`). L'ID di ogni domanda deve restare stabile,
 perché le statistiche sincronizzate fanno riferimento ad esso.
 
 > ⚠️ Le domande sono a scopo di esercitazione e vanno verificate rispetto al listato ministeriale in vigore.
@@ -79,7 +93,8 @@ src/
     exam-session.tsx simulazione d'esame
     auth.tsx         accesso / registrazione
     chapter/[id].tsx guida dell'argomento
-  components/        UI in stile Duolingo (bottoni 3D, nodi del percorso, barre)
+    signs.tsx        dizionario dei segnali
+  components/        UI in stile Duolingo (bottoni 3D, nodi del percorso, barre) e segnali SVG
   data/              argomenti e banca domande
   lib/               logica quiz, sincronizzazione, Supabase, date
   store/             stato dei progressi e autenticazione

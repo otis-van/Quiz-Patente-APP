@@ -1,7 +1,7 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 
 import { haptic } from '@/lib/haptics';
-import { C, F } from '@/theme';
+import { F, makeStyles, useColors } from '@/theme';
 
 export type NodeState = 'done' | 'current' | 'locked';
 
@@ -17,8 +17,10 @@ interface Props {
 
 /** Nodo circolare del percorso, con bordo 3D e fumetto "INIZIA" sul nodo attivo. */
 export function PathNode({ state, color, colorDark, icon, offset, onPress, label }: Props) {
+  const C = useColors();
+  const styles = useStyles();
   const bg = state === 'locked' ? C.grayLight : state === 'done' ? C.yellow : color;
-  const edge = state === 'locked' ? '#CECECE' : state === 'done' ? C.yellowDark : colorDark;
+  const edge = state === 'locked' ? C.lockedEdge : state === 'done' ? C.yellowDark : colorDark;
   return (
     <View style={[styles.wrap, { transform: [{ translateX: offset }] }]}>
       {state === 'current' && (
@@ -55,13 +57,13 @@ export function PathNode({ state, color, colorDark, icon, offset, onPress, label
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((C) => ({
   wrap: { alignItems: 'center', marginVertical: 6 },
   ring: { padding: 6, borderRadius: 50, borderWidth: 6, borderColor: 'transparent' },
   node: { width: 72, height: 72, borderRadius: 36, alignItems: 'center', justifyContent: 'center' },
   icon: { fontSize: 30, color: C.white, fontFamily: F.black },
   bubble: {
-    backgroundColor: C.white,
+    backgroundColor: C.bg,
     borderWidth: 2,
     borderColor: C.grayLight,
     borderRadius: 12,
@@ -76,10 +78,10 @@ const styles = StyleSheet.create({
     bottom: -8,
     width: 14,
     height: 14,
-    backgroundColor: C.white,
+    backgroundColor: C.bg,
     borderRightWidth: 2,
     borderBottomWidth: 2,
     borderColor: C.grayLight,
     transform: [{ rotate: '45deg' }],
   },
-});
+}));

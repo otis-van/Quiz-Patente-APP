@@ -1,7 +1,7 @@
-import { ScrollView, StyleSheet, View, ViewStyle } from 'react-native';
+import { ScrollView, View, ViewStyle } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { C, MAX_WIDTH } from '@/theme';
+import { MAX_WIDTH, makeStyles } from '@/theme';
 
 interface Props {
   children: React.ReactNode;
@@ -12,6 +12,7 @@ interface Props {
 
 /** Contenitore standard: area sicura, larghezza massima (tablet/web) e scroll opzionale. */
 export function Screen({ children, header, scroll = true, contentStyle }: Props) {
+  const styles = useStyles();
   return (
     <SafeAreaView style={styles.root} edges={['top', 'left', 'right']}>
       {header && <View style={styles.headerWrap}><View style={styles.inner}>{header}</View></View>}
@@ -26,10 +27,10 @@ export function Screen({ children, header, scroll = true, contentStyle }: Props)
   );
 }
 
-const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: C.white },
-  headerWrap: { borderBottomWidth: 2, borderBottomColor: C.grayLight, backgroundColor: C.white },
+const useStyles = makeStyles((C) => ({
+  root: { flex: 1, backgroundColor: C.bg },
+  headerWrap: { borderBottomWidth: 2, borderBottomColor: C.grayLight, backgroundColor: C.bg },
   scroll: { flexGrow: 1, paddingBottom: 32 },
   inner: { width: '100%', maxWidth: MAX_WIDTH, alignSelf: 'center' },
   pad: { paddingHorizontal: 16 },
-});
+}));

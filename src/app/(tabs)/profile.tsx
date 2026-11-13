@@ -1,15 +1,17 @@
 import { router } from 'expo-router';
-import { Alert, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Alert, Platform, Pressable, Switch, Text, View } from 'react-native';
 import { useShallow } from 'zustand/react/shallow';
 
 import { DuoButton } from '@/components/DuoButton';
 import { Screen } from '@/components/Screen';
 import { addDays, dayKey, longestStreak } from '@/lib/date';
+import { remindersSupported, requestReminderPermission } from '@/lib/reminders';
 import { isCloudEnabled } from '@/lib/supabase';
 import { syncNow, useSyncStatus } from '@/lib/sync';
 import { displayName, useAuth } from '@/store/auth';
 import { streakOf, totalXp, useProgress } from '@/store/progress';
-import { C, F } from '@/theme';
+import { ThemeMode, useSettings } from '@/store/settings';
+import { F, makeStyles, useColors } from '@/theme';
 
 const GOALS = [
   { xp: 10, label: 'Tranquillo' },
@@ -32,6 +34,8 @@ function ask(title: string, msg: string, onOk: () => void) {
 }
 
 export default function ProfileScreen() {
+  const C = useColors();
+  const styles = useStyles();
   const session = useAuth((s) => s.session);
   const sync = useSyncStatus();
   const p = useProgress(
@@ -156,6 +160,12 @@ export default function ProfileScreen() {
         ))}
       </View>
 
+      <Text style={styles.section}>Promemoria giornaliero</Text>
+      <ReminderSettings />
+
+      <Text style={styles.section}>Aspetto</Text>
+      <ThemeSettings />
+
       <DuoButton
         title="Azzera progressi"
         variant="ghost"
@@ -170,7 +180,89 @@ export default function ProfileScreen() {
   );
 }
 
+const THEMES: { mode: ThemeMode; label: string; icon: string }[] = [
+  { mode: 'system', label: 'Automatico', icon: '📱' },
+  { mode: 'light', label: 'Chiaro', icon: '☀️' },
+  { mode: 'dark', label: 'Scuro', icon: '🌙' },
+];
+
+function ThemeSettings() {
+  const styles = useStyles();
+  const mode = useSettings((s) => s.themeMode);
+  return (
+    <View style={styles.segment}>
+      {THEMES.map((t) => (
+        <Pressable
+          key={t.mode}
+          onPress={() => useSettings.getState().setThemeMode(t.mode)}
+          accessibilityRole="button"
+          accessibilityState={{ selected: mode === t.mode }}
+          style={[styles.segmentItem, mode === t.mode && styles.segmentSel]}>
+          <Text style={{ fontSize: 22 }}>{t.icon}</Text>
+          <Text style={[styles.segmentLabel, mode === t.mode && styles.segmentLabelSel]}>{t.label}</Text>
+        </Pressable>
+      ))}
+    </View>
+  );
+}
+
+const pad = (n: number) => String(n).padStart(2, '0');
+
+function ReminderSettings() {
+  const C = useColors();
+  const styles = useStyles();
+  const { reminderEnabled, reminderHour, reminderMinute, setReminder } = useSettings();
+
+  if (!remindersSupported) {
+    return (
+      <View style={styles.card}>
+        <Text style={styles.cardText}>I promemoria sono disponibili nell’app per iOS e Android.</Text>
+      </View>
+    );
+  }
+
+  const shift = (deltaMin: number) => {
+    const total = (reminderHour * 60 + reminderMinute + deltaMin + 24 * 60) % (24 * 60);
+    setReminder({ reminderHour: Math.floor(total / 60), reminderMinute: total % 60 });
+  };
+
+  const toggle = async (on: boolean) => {
+    if (on && !(await requestReminderPermission())) {
+      Alert.alert('Notifiche disattivate', 'Per ricevere i promemoria consenti le notifiche dalle impostazioni del telefono.');
+      return;
+    }
+    setReminder({ reminderEnabled: on });
+  };
+
+  return (
+    <View style={styles.card}>
+      <View style={styles.switchRow}>
+        <View style={{ flex: 1 }}>
+          <Text style={styles.cardTitle}>⏰ Ricordami di studiare</Text>
+          <Text style={styles.cardText}>Non arriva se hai già raggiunto l’obiettivo di oggi.</Text>
+        </View>
+        <Switch
+          value={reminderEnabled}
+          onValueChange={toggle}
+          trackColor={{ true: C.green, false: C.grayLight }}
+          thumbColor={C.white}
+        />
+      </View>
+      {reminderEnabled && (
+        <View style={styles.timeRow}>
+          <DuoButton title="−" variant="white" small onPress={() => shift(-30)} style={{ width: 56 }} />
+          <Text style={styles.time}>
+            {pad(reminderHour)}:{pad(reminderMinute)}
+          </Text>
+          <DuoButton title="+" variant="white" small onPress={() => shift(30)} style={{ width: 56 }} />
+        </View>
+      )}
+    </View>
+  );
+}
+
 function Stat({ icon, value, label }: { icon: string; value: string | number; label: string }) {
+  const styles = useStyles();
   return (
     <View style={styles.stat}>
       <Text style={{ fontSize: 22 }}>{icon}</Text>
@@ -182,7 +274,7 @@ function Stat({ icon, value, label }: { icon: string; value: string | number; la
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((C) => ({
   header: { alignItems: 'center', paddingTop: 24, paddingBottom: 8, gap: 4 },
   avatar: {
     width: 96,
@@ -225,4 +317,21 @@ const styles = StyleSheet.create({
   goalSel: { backgroundColor: C.blueLight },
   goalLabel: { fontFamily: F.bold, fontSize: 16, color: C.text },
   goalXp: { fontFamily: F.regular, fontSize: 15, color: C.textLight },
-});
+  segment: { flexDirection: 'row', gap: 10, marginTop: 16 },
+  segmentItem: {
+    flex: 1,
+    alignItems: 'center',
+    gap: 4,
+    paddingVertical: 12,
+    borderWidth: 2,
+    borderBottomWidth: 4,
+    borderColor: C.grayLight,
+    borderRadius: 16,
+  },
+  segmentSel: { backgroundColor: C.blueLight, borderColor: C.blueBorder },
+  segmentLabel: { fontFamily: F.bold, color: C.text, fontSize: 14 },
+  segmentLabelSel: { color: C.blue },
+  switchRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  timeRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 20, marginTop: 12 },
+  time: { fontFamily: F.black, fontSize: 32, color: C.text, minWidth: 100, textAlign: 'center' },
+}));

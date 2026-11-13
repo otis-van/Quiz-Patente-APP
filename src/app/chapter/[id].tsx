@@ -1,16 +1,19 @@
 import { router, useLocalSearchParams } from 'expo-router';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { DuoButton } from '@/components/DuoButton';
 import { ProgressBar } from '@/components/ProgressBar';
+import { RoadSign } from '@/components/RoadSign';
 import { chapterById } from '@/data/chapters';
 import { questionsOfChapter } from '@/data/questions';
 import { chapterMastery, mastery, useProgress } from '@/store/progress';
-import { C, F, MAX_WIDTH } from '@/theme';
+import { F, MAX_WIDTH, makeStyles, useColors } from '@/theme';
 
 /** Guida dell'argomento: tutte le domande con risposta e il tuo livello di padronanza. */
 export default function ChapterScreen() {
+  const C = useColors();
+  const styles = useStyles();
   const { id } = useLocalSearchParams<{ id: string }>();
   const ch = chapterById(Number(id));
   const questions = questionsOfChapter(Number(id));
@@ -48,8 +51,9 @@ export default function ChapterScreen() {
                 <View style={{ flexDirection: 'row', gap: 10 }}>
                   <Text>{badge}</Text>
                   <Text style={styles.qText}>{q.text}</Text>
+                  {q.sign && <RoadSign id={q.sign} size={56} />}
                 </View>
-                <Text style={[styles.answer, { color: q.answer ? C.greenDark : C.redDark }]}>
+                <Text style={[styles.answer, { color: q.answer ? C.greenText : C.redText }]}>
                   {q.answer ? 'VERO' : 'FALSO'}
                 </Text>
                 {q.explanation && <Text style={styles.expl}>{q.explanation}</Text>}
@@ -69,8 +73,8 @@ export default function ChapterScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: C.white },
+const useStyles = makeStyles((C) => ({
+  root: { flex: 1, backgroundColor: C.bg },
   inner: { width: '100%', maxWidth: MAX_WIDTH, alignSelf: 'center' },
   header: { padding: 16, borderBottomWidth: 5 },
   back: { fontFamily: F.bold, color: C.white, fontSize: 16, marginBottom: 12 },
@@ -85,4 +89,4 @@ const styles = StyleSheet.create({
   expl: { fontFamily: F.regular, color: C.textLight, fontSize: 14, marginLeft: 28, lineHeight: 20 },
   legend: { fontFamily: F.regular, color: C.gray, fontSize: 12, textAlign: 'center', marginTop: 8 },
   footer: { padding: 16, borderTopWidth: 2, borderTopColor: C.grayLight },
-});
+}));

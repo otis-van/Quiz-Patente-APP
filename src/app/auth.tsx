@@ -1,13 +1,15 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, Pressable, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { DuoButton } from '@/components/DuoButton';
 import { useAuth } from '@/store/auth';
-import { C, F } from '@/theme';
+import { F, makeStyles, useColors } from '@/theme';
 
 export default function AuthScreen() {
+  const C = useColors();
+  const styles = useStyles();
   const params = useLocalSearchParams<{ mode?: 'signin' | 'signup' }>();
   const [mode, setMode] = useState<'signin' | 'signup'>(params.mode ?? 'signin');
   const [name, setName] = useState('');
@@ -98,8 +100,8 @@ export default function AuthScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: C.white },
+const useStyles = makeStyles((C) => ({
+  root: { flex: 1, backgroundColor: C.bg },
   inner: { width: '100%', maxWidth: 480, alignSelf: 'center', padding: 20 },
   top: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 },
   close: { fontSize: 24, color: C.gray, fontFamily: F.bold },
@@ -118,6 +120,6 @@ const styles = StyleSheet.create({
   },
   inputTop: { borderTopWidth: 0 },
   inputBottom: {},
-  message: { fontFamily: F.bold, color: C.redDark, fontSize: 15, marginTop: 12, textAlign: 'center' },
+  message: { fontFamily: F.bold, color: C.redText, fontSize: 15, marginTop: 12, textAlign: 'center' },
   note: { fontFamily: F.regular, color: C.gray, fontSize: 13, textAlign: 'center', marginTop: 16 },
-});
+}));
