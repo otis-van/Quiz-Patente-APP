@@ -1,0 +1,85 @@
+# Compila l'app iOS su un Mac di GitHub e pubblica un .ipa NON firmato
+# (da firmare con un servizio come Signulous, AltStore o Sideloadly).
+# Avvio: GitHub → Actions → "Build iOS (.ipa)" → Run workflow.
+name: Build iOS (.ipa)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ios-ipa
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: macos-latest
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Genera il progetto nativo iOS
+        run: npx expo prebuild --platform ios --clean
+        env:
+          CI: 1
+
+      - name: Compila (Release, senza firma)
+        run: |
+          mkdir -p build
+          WS=$(ls -d ios/*.xcworkspace | head -1)
+          SCHEME=$(basename "$WS" .xcworkspace)
+          echo "Workspace: $WS  Scheme: $SCHEME"
+          xcodebuild \
+            -workspace "$WS" \
+            -scheme "$SCHEME" \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            -archivePath "$PWD/build/App.xcarchive" \
+            archive \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
+            > build/xcodebuild.log 2>&1 || { grep -E "error:|\*\* ARCHIVE FAILED" build/xcodebuild.log | head -50; tail -150 build/xcodebuild.log; exit 1; }
+          tail -5 build/xcodebuild.log
+
+      - name: Crea il file .ipa
+        run: |
+          mkdir -p build/Payload
+          cp -R build/App.xcarchive/Products/Applications/*.app build/Payload/
+          cd build && zip -qry QuizPatenteB.ipa Payload
+          ls -lh QuizPatenteB.ipa
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: QuizPatenteB-ipa
+          path: build/QuizPatenteB.ipa
+
+      - name: Pubblica nella Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ios-build-${{ github.run_number }}
+          name: Quiz Patente B – iOS build ${{ github.run_number }}
+          prerelease: true
+          files: build/QuizPatenteB.ipa
+          body: |
+            File .ipa **non firmato**: firmalo e installalo con Signulous (o AltStore / Sideloadly).
+            Commit: ${{ github.sha }}
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: xcodebuild-log
+          path: build/xcodebuild.log
+          if-no-files-found: ignore
