@@ -49,7 +49,7 @@ const useStyles = makeStyles((C) => ({
   icon: {
     width: 46,
     height: 34,
-    borderRadius: 6,
+    borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 2,

@@ -58,6 +58,7 @@ const useStyles = makeStyles((C) => ({
     height: 16,
     borderWidth: 1.5,
     borderColor: C.ink,
+    borderRadius: 5,
     backgroundColor: C.white,
     alignItems: 'center',
     justifyContent: 'center',

@@ -56,7 +56,7 @@ const useStyles = makeStyles((C) => ({
   node: {
     width: 72,
     height: 72,
-    borderRadius: 14,
+    borderRadius: 24,
     borderWidth: 2.5,
     borderColor: C.ink,
     alignItems: 'center',
@@ -67,7 +67,7 @@ const useStyles = makeStyles((C) => ({
     backgroundColor: C.surface,
     borderWidth: 2,
     borderColor: C.ink,
-    borderRadius: 4,
+    borderRadius: 10,
     paddingHorizontal: 10,
     paddingVertical: 6,
     marginBottom: 10,

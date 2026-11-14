@@ -358,7 +358,7 @@ const useStyles = makeStyles((C) => ({
   statIcon: {
     width: 40,
     height: 40,
-    borderRadius: 6,
+    borderRadius: 12,
     borderWidth: 2,
     borderColor: C.ink,
     alignItems: 'center',
@@ -376,7 +376,7 @@ const useStyles = makeStyles((C) => ({
     backgroundColor: C.surfaceAlt,
     borderWidth: 2,
     borderColor: C.ink,
-    borderRadius: 3,
+    borderRadius: 8,
     overflow: 'hidden',
   },
   bar: { width: '100%', borderTopWidth: 2, borderTopColor: C.ink },
@@ -405,7 +405,7 @@ const useStyles = makeStyles((C) => ({
   timeRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 16, marginTop: 16 },
   timeBox: {
     backgroundColor: C.ink,
-    borderRadius: 6,
+    borderRadius: 12,
     paddingHorizontal: 14,
     paddingVertical: 6,
   },

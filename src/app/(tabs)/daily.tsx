@@ -166,7 +166,7 @@ const useStyles = makeStyles((C) => ({
   signBox: {
     width: 56,
     height: 56,
-    borderRadius: 6,
+    borderRadius: 12,
     borderWidth: 2,
     borderColor: C.ink,
     backgroundColor: C.white,
@@ -179,7 +179,7 @@ const useStyles = makeStyles((C) => ({
   rowIcon: {
     width: 46,
     height: 46,
-    borderRadius: 6,
+    borderRadius: 12,
     borderWidth: 2,
     borderColor: C.ink,
     alignItems: 'center',

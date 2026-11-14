@@ -257,7 +257,7 @@ const useStyles = makeStyles((C) => ({
   cell: {
     width: 36,
     height: 36,
-    borderRadius: 4,
+    borderRadius: 10,
     borderWidth: 2,
     borderColor: C.ink,
     backgroundColor: C.surface,
@@ -274,7 +274,7 @@ const useStyles = makeStyles((C) => ({
     gap: 6,
     borderWidth: 2,
     borderColor: C.ink,
-    borderRadius: 4,
+    borderRadius: 10,
     paddingHorizontal: 8,
     paddingVertical: 3,
   },
@@ -285,7 +285,7 @@ const useStyles = makeStyles((C) => ({
   vf: {
     borderWidth: 2,
     borderColor: C.ink,
-    borderRadius: 6,
+    borderRadius: 12,
     backgroundColor: C.surface,
     paddingVertical: 18,
     alignItems: 'center',

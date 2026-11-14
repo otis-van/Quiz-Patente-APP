@@ -69,7 +69,7 @@ const useStyles = makeStyles((C) => ({
     backgroundColor: C.yellow,
     borderWidth: 2,
     borderColor: C.ink,
-    borderRadius: 4,
+    borderRadius: 10,
     paddingHorizontal: 8,
     paddingVertical: 2,
     marginBottom: 12,

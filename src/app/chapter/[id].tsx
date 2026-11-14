@@ -105,7 +105,7 @@ const useStyles = makeStyles((C) => ({
   headIcon: {
     width: 60,
     height: 60,
-    borderRadius: 6,
+    borderRadius: 12,
     borderWidth: 2,
     borderColor: C.ink,
     backgroundColor: C.white,
@@ -119,7 +119,7 @@ const useStyles = makeStyles((C) => ({
   levelText: { fontFamily: F.black, color: C.onAccent, width: 46, textAlign: 'right' },
   section: { fontFamily: F.black, fontSize: 20, color: C.text, marginBottom: 4 },
   card: { ...boxed(C, 3), backgroundColor: C.surface, padding: 14, gap: 6 },
-  dot: { width: 14, height: 14, borderRadius: 3, borderWidth: 2, borderColor: C.ink, marginTop: 4 },
+  dot: { width: 14, height: 14, borderRadius: 8, borderWidth: 2, borderColor: C.ink, marginTop: 4 },
   qText: { flex: 1, fontFamily: F.bold, color: C.text, fontSize: 15, lineHeight: 21 },
   answer: { fontFamily: F.pixel, fontSize: 13, marginLeft: 24 },
   expl: { fontFamily: F.regular, color: C.textLight, fontSize: 14, marginLeft: 24, lineHeight: 20 },

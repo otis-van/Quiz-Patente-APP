@@ -24,10 +24,10 @@ const useStyles = makeStyles((C) => ({
     backgroundColor: C.surface,
     borderWidth: 2,
     borderColor: C.ink,
-    borderRadius: 4,
+    borderRadius: 999,
     padding: 2,
     overflow: 'hidden',
   },
-  fill: { height: '100%', minWidth: 6, borderRadius: 1, overflow: 'hidden' },
-  shine: { position: 'absolute', left: 3, right: 3, top: 2, height: 2, backgroundColor: 'rgba(255,255,255,0.55)' },
+  fill: { height: '100%', minWidth: 8, borderRadius: 999, overflow: 'hidden' },
+  shine: { position: 'absolute', left: 6, right: 6, borderRadius: 2, top: 2, height: 2, backgroundColor: 'rgba(255,255,255,0.55)' },
 }));

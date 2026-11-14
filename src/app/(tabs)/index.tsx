@@ -130,7 +130,7 @@ const useStyles = makeStyles((C) => ({
   bannerIcon: {
     width: 50,
     height: 50,
-    borderRadius: 6,
+    borderRadius: 12,
     borderWidth: 2,
     borderColor: C.ink,
     backgroundColor: C.white,
@@ -144,7 +144,7 @@ const useStyles = makeStyles((C) => ({
   guideBtn: {
     width: 40,
     height: 40,
-    borderRadius: 6,
+    borderRadius: 12,
     borderWidth: 2,
     borderColor: C.ink,
     backgroundColor: C.white,

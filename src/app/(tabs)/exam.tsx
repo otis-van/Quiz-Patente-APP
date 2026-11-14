@@ -121,7 +121,7 @@ const useStyles = makeStyles((C) => ({
   historyBadge: {
     width: 44,
     height: 44,
-    borderRadius: 6,
+    borderRadius: 12,
     borderWidth: 2,
     borderColor: C.ink,
     alignItems: 'center',

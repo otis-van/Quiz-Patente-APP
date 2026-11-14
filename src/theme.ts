@@ -87,7 +87,7 @@ export const boxed = (c: Palette, size = 4) => ({
   ...hardShadow(c, size),
 });
 
-export const RADIUS = 6;
+export const RADIUS = 18;
 
 /**
  * Font: Space Grotesk per i testi, Space Mono per i titoli,
