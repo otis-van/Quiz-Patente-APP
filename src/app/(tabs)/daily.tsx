@@ -2,7 +2,7 @@ import { router } from 'expo-router';
 import { Pressable, Text, View } from 'react-native';
 import { useShallow } from 'zustand/react/shallow';
 
-import { IconName, PixelIcon } from '@/components/PixelIcon';
+import { Icon, IconName } from '@/components/Icon';
 import { ProgressBar } from '@/components/ProgressBar';
 import { RetroButton } from '@/components/RetroButton';
 import { RoadSign } from '@/components/RoadSign';
@@ -46,7 +46,7 @@ export default function DailyScreen() {
       <Window title="missioni_del_giorno.exe" color={C.lilac} style={{ marginTop: 14 }} bodyStyle={{ padding: 0 }}>
         {quests.map((q, i) => (
           <View key={q.title} style={[styles.quest, i > 0 && styles.questBorder]}>
-            <PixelIcon name={q.icon} size={30} />
+            <Icon name={q.icon} size={30} />
             <View style={{ flex: 1, gap: 6 }}>
               <Text style={styles.questTitle}>{q.title}</Text>
               <View style={styles.questBarRow}>
@@ -56,7 +56,7 @@ export default function DailyScreen() {
                 </Text>
               </View>
             </View>
-            <PixelIcon name={q.value >= q.target ? 'gift' : 'box'} size={30} />
+            <Icon name={q.value >= q.target ? 'gift' : 'box'} size={30} />
           </View>
         ))}
       </Window>
@@ -88,7 +88,7 @@ export default function DailyScreen() {
               <Text style={styles.quickTitle}>Dizionario dei segnali</Text>
               <Text style={styles.quickSub}>Tutti i segnali illustrati, divisi per categoria</Text>
             </View>
-            <PixelIcon name="chevron" size={20} />
+            <Icon name="chevron" size={20} />
           </View>
         )}
       </Pressable>
@@ -107,7 +107,7 @@ export default function DailyScreen() {
               {({ pressed }) => (
                 <View style={[styles.row, done && { backgroundColor: C.yellow }, pressed && styles.pressed]}>
                   <View style={[styles.rowIcon, { backgroundColor: ch.color }]}>
-                    <PixelIcon name={ch.icon} size={26} />
+                    <Icon name={ch.icon} size={26} />
                   </View>
                   <View style={{ flex: 1 }}>
                     <Text style={[styles.rowKicker, done && { color: C.onAccent }]}>
@@ -115,7 +115,7 @@ export default function DailyScreen() {
                     </Text>
                     <Text style={[styles.rowTitle, done && { color: C.onAccent }]}>{ch.short}</Text>
                   </View>
-                  {done ? <PixelIcon name="check" size={24} /> : <PixelIcon name="chevron" size={20} />}
+                  {done ? <Icon name="check" size={24} /> : <Icon name="chevron" size={20} />}
                 </View>
               )}
             </Pressable>
@@ -125,7 +125,7 @@ export default function DailyScreen() {
       <RetroButton
         title="Simulazione d’esame"
         variant="lilac"
-        icon={<PixelIcon name="doc" size={20} />}
+        icon={<Icon name="doc" size={20} />}
         style={{ marginTop: 22 }}
         onPress={() => router.push('/exam-session')}
       />
@@ -139,7 +139,7 @@ function QuickCard(p: { icon: IconName; title: string; subtitle: string; color: 
     <Pressable onPress={p.onPress} style={{ flex: 1 }}>
       {({ pressed }) => (
         <View style={[styles.quick, { backgroundColor: p.color }, pressed && styles.pressed]}>
-          <PixelIcon name={p.icon} size={34} />
+          <Icon name={p.icon} size={34} />
           <Text style={[styles.quickTitle, styles.onAccent]}>{p.title}</Text>
           <Text style={[styles.quickSub, styles.onAccent]}>{p.subtitle}</Text>
         </View>

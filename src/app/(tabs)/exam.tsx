@@ -2,7 +2,7 @@ import { router } from 'expo-router';
 import { Text, View } from 'react-native';
 import { useShallow } from 'zustand/react/shallow';
 
-import { IconName, PixelIcon } from '@/components/PixelIcon';
+import { Icon, IconName } from '@/components/Icon';
 import { RetroButton } from '@/components/RetroButton';
 import { Screen } from '@/components/Screen';
 import { StatsBar } from '@/components/StatsBar';
@@ -24,7 +24,7 @@ export default function ExamTab() {
   return (
     <Screen header={<StatsBar left={<Text style={styles.headerTitle}>ESAME</Text>} />}>
       <Window title="simulazione_esame.exe" color={C.blue} style={{ marginTop: 20 }} bodyStyle={styles.hero}>
-        <PixelIcon name="doc" size={64} />
+        <Icon name="doc" size={64} />
         <Text style={styles.heroTitle}>Simulazione d’esame</Text>
         <Text style={styles.heroText}>Come all’esame ufficiale della Motorizzazione:</Text>
         <View style={styles.rules}>
@@ -65,7 +65,7 @@ export default function ExamTab() {
         {exams.slice(0, 20).map((e) => (
           <View key={e.id} style={styles.historyRow}>
             <View style={[styles.historyBadge, { backgroundColor: e.passed ? C.green : C.pink }]}>
-              <PixelIcon name={e.passed ? 'cap' : 'book'} size={26} />
+              <Icon name={e.passed ? 'cap' : 'book'} size={26} />
             </View>
             <View style={{ flex: 1 }}>
               <Text style={[styles.historyTitle, { color: e.passed ? C.greenText : C.redText }]}>
@@ -86,7 +86,7 @@ function Rule({ icon, text }: { icon: IconName; text: string }) {
   const styles = useStyles();
   return (
     <View style={styles.rule}>
-      <PixelIcon name={icon} size={20} />
+      <Icon name={icon} size={20} />
       <Text style={styles.ruleText}>{text}</Text>
     </View>
   );

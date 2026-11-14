@@ -4,7 +4,7 @@ import { Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { GridBackground } from '@/components/GridBackground';
-import { IconName, PixelIcon } from '@/components/PixelIcon';
+import { Icon, IconName } from '@/components/Icon';
 import { ProgressBar } from '@/components/ProgressBar';
 import { RetroButton } from '@/components/RetroButton';
 import { RoadSign } from '@/components/RoadSign';
@@ -103,7 +103,7 @@ export default function QuizScreen() {
     return (
       <SafeAreaView style={[styles.root, styles.center]}>
         <GridBackground />
-        <PixelIcon name="sparkle" size={88} />
+        <Icon name="sparkle" size={88} />
         <Text style={styles.title}>Nessun errore da ripassare!</Text>
         <Text style={styles.subtitle}>Continua con le lezioni per mettere alla prova le tue conoscenze.</Text>
         <RetroButton title="Torna indietro" onPress={() => router.back()} style={{ alignSelf: 'stretch', margin: 24 }} />
@@ -117,7 +117,7 @@ export default function QuizScreen() {
       <SafeAreaView style={styles.root}>
         <GridBackground />
         <View style={[styles.inner, styles.center, { flex: 1 }]}>
-          <PixelIcon name={accuracy === 100 ? 'trophy' : accuracy >= 70 ? 'sparkle' : 'heart'} size={96} />
+          <Icon name={accuracy === 100 ? 'trophy' : accuracy >= 70 ? 'sparkle' : 'heart'} size={96} />
           <Text style={[styles.title, { marginTop: 16 }]}>
             {mode === 'lesson' ? 'Lezione completata!' : mode === 'daily' ? 'Esercizio del giorno completato!' : 'Allenamento completato!'}
           </Text>
@@ -140,12 +140,12 @@ export default function QuizScreen() {
       <GridBackground />
       <View style={[styles.inner, styles.topBar]}>
         <Pressable onPress={() => router.back()} hitSlop={12} accessibilityLabel="Chiudi">
-          <PixelIcon name="close" size={26} />
+          <Icon name="close" size={26} />
         </Pressable>
         <ProgressBar value={progress} />
         {combo >= 3 && (
           <View style={styles.comboBox}>
-            <PixelIcon name="fire" size={18} />
+            <Icon name="fire" size={18} />
             <Text style={styles.combo}>{combo}</Text>
           </View>
         )}
@@ -171,7 +171,7 @@ export default function QuizScreen() {
             </View>
           )}
           <View style={styles.questionRow}>
-            <PixelIcon name="trafficLight" size={56} />
+            <Icon name="trafficLight" size={56} />
             <View style={styles.speech}>
               <Text style={styles.question}>{current.q.text}</Text>
             </View>
@@ -196,7 +196,7 @@ export default function QuizScreen() {
         <View style={[styles.sheet, { backgroundColor: isCorrect ? C.green : C.red }]}>
           <View style={styles.inner}>
             <View style={styles.sheetHead}>
-              <PixelIcon name={isCorrect ? 'check' : 'cross'} size={30} />
+              <Icon name={isCorrect ? 'check' : 'cross'} size={30} />
               <Text style={styles.sheetTitle}>{isCorrect ? praise : 'Risposta corretta:'}</Text>
               {!isCorrect && <Text style={styles.sheetAnswer}>{current.q.answer ? 'VERO' : 'FALSO'}</Text>}
             </View>
@@ -242,7 +242,7 @@ function Choice({
             { backgroundColor: bg },
             pressed || down ? { transform: [{ translateX: 4 }, { translateY: 4 }] } : hardShadow(C, 4),
           ]}>
-          <PixelIcon name={icon} size={30} />
+          <Icon name={icon} size={30} />
           <Text style={[styles.choiceText, { color: fg }]}>{label}</Text>
         </View>
       )}
@@ -259,7 +259,7 @@ function Tile({ label, value, color, icon }: { label: string; value: string; col
     <View style={styles.tile}>
       <Text style={[styles.tileLabel, { backgroundColor: color }]}>{label}</Text>
       <View style={styles.tileBody}>
-        <PixelIcon name={icon} size={22} />
+        <Icon name={icon} size={22} />
         <Text style={styles.tileValue}>{value}</Text>
       </View>
     </View>

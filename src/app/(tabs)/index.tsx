@@ -3,7 +3,7 @@ import { Pressable, Text, View } from 'react-native';
 import { useShallow } from 'zustand/react/shallow';
 
 import { PathNode, NodeState } from '@/components/PathNode';
-import { PixelIcon } from '@/components/PixelIcon';
+import { Icon } from '@/components/Icon';
 import { ProgressBar } from '@/components/ProgressBar';
 import { RetroButton } from '@/components/RetroButton';
 import { Screen } from '@/components/Screen';
@@ -28,7 +28,7 @@ export default function PathScreen() {
         <StatsBar
           left={
             <View style={styles.brandRow}>
-              <PixelIcon name="car" size={26} />
+              <Icon name="car" size={26} />
               <Text style={styles.brand}>PATENTE.B</Text>
             </View>
           }
@@ -38,7 +38,7 @@ export default function PathScreen() {
         <Window title="continua.exe" color={C.pink} style={{ marginTop: 20 }} bodyStyle={{ gap: 12 }}>
           <View style={styles.continueRow}>
             <View style={[styles.continueIcon, { backgroundColor: next.color }]}>
-              <PixelIcon name={next.icon} size={32} />
+              <Icon name={next.icon} size={32} />
             </View>
             <View style={{ flex: 1 }}>
               <Text style={styles.continueLabel}>Riprendi da dove eri rimasto</Text>
@@ -49,7 +49,7 @@ export default function PathScreen() {
           </View>
           <RetroButton
             title="Inizia lezione"
-            icon={<PixelIcon name="star" size={18} />}
+            icon={<Icon name="star" size={18} />}
             onPress={() => router.push({ pathname: '/quiz', params: { mode: 'lesson', chapter: next.id } })}
           />
         </Window>
@@ -76,7 +76,7 @@ function Unit({ chapter }: { chapter: Chapter }) {
         {({ pressed }) => (
           <View style={[styles.banner, { backgroundColor: chapter.color }, pressed && styles.pressed]}>
             <View style={styles.bannerIcon}>
-              <PixelIcon name={chapter.icon} size={34} />
+              <Icon name={chapter.icon} size={34} />
             </View>
             <View style={{ flex: 1 }}>
               <Text style={styles.bannerKicker}>ARGOMENTO {String(chapter.id).padStart(2, '0')}</Text>
@@ -87,7 +87,7 @@ function Unit({ chapter }: { chapter: Chapter }) {
               </View>
             </View>
             <View style={styles.guideBtn}>
-              <PixelIcon name="book" size={22} />
+              <Icon name="book" size={22} />
             </View>
           </View>
         )}

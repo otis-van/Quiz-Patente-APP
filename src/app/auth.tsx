@@ -4,7 +4,7 @@ import { KeyboardAvoidingView, Platform, Pressable, Text, TextInput, View } from
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { GridBackground } from '@/components/GridBackground';
-import { PixelIcon } from '@/components/PixelIcon';
+import { Icon } from '@/components/Icon';
 import { RetroButton } from '@/components/RetroButton';
 import { Window } from '@/components/Window';
 import { useAuth } from '@/store/auth';
@@ -41,7 +41,7 @@ export default function AuthScreen() {
         <View style={styles.inner}>
           <View style={styles.top}>
             <Pressable onPress={() => router.back()} hitSlop={12}>
-              <PixelIcon name="close" size={26} />
+              <Icon name="close" size={26} />
             </Pressable>
             <Pressable onPress={() => setMode(signup ? 'signin' : 'signup')}>
               <Text style={styles.switch}>{signup ? 'ACCEDI' : 'REGISTRATI'}</Text>

@@ -1,7 +1,7 @@
 import { Text, View } from 'react-native';
 import { useShallow } from 'zustand/react/shallow';
 
-import { IconName, PixelIcon } from '@/components/PixelIcon';
+import { Icon, IconName } from '@/components/Icon';
 import { streakOf, todayXp, totalXp, useProgress } from '@/store/progress';
 import { F, makeStyles } from '@/theme';
 
@@ -25,7 +25,7 @@ function Stat({ icon, value, label, dim }: { icon: IconName; value: string | num
   const styles = useStyles();
   return (
     <View style={styles.stat} accessibilityLabel={`${value} ${label}`}>
-      <PixelIcon name={icon} size={20} dim={dim} />
+      <Icon name={icon} size={20} dim={dim} />
       <Text style={styles.value}>{value}</Text>
     </View>
   );

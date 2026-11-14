@@ -1,7 +1,7 @@
 /**
  * I 25 argomenti del programma ministeriale per l'esame teorico della patente B.
  */
-import type { IconName } from '@/components/PixelIcon';
+import type { IconName } from '@/components/Icon';
 
 export interface Chapter {
   id: number;

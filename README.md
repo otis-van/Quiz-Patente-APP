@@ -7,7 +7,7 @@ sul telefono e continuare sul tablet.
 
 **Stile:** Y2K / neo-brutalista — sfondo crema (tema chiaro) o grigio (tema scuro), contorni neri
 con ombre nette, accenti pastello, riquadri a "finestra" da vecchio sistema operativo, icone in
-pixel art (`src/components/PixelIcon.tsx`) e font Space Grotesk, Space Mono e Silkscreen.
+stile "sticker" vettoriale (`src/components/Icon.tsx`) e font Space Grotesk, Space Mono e Silkscreen.
 All'apertura parte una di 4 animazioni con un'auto (`src/components/IntroAnimation.tsx`), scelta a caso;
 si salta con un tocco e si può disattivare dal Profilo. Sul web `?intro=1..4` forza una scena.
 

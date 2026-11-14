@@ -3,7 +3,7 @@ import { Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { GridBackground } from '@/components/GridBackground';
-import { PixelIcon } from '@/components/PixelIcon';
+import { Icon } from '@/components/Icon';
 import { RoadSign, SignId, SIGNS } from '@/components/RoadSign';
 import { boxed, F, makeStyles, MAX_WIDTH } from '@/theme';
 
@@ -27,7 +27,7 @@ export default function SignsScreen() {
       <View style={styles.topWrap}>
         <View style={[styles.inner, styles.top]}>
           <Pressable onPress={() => router.back()} hitSlop={12} style={styles.backRow} accessibilityLabel="Indietro">
-            <PixelIcon name="arrow" size={20} />
+            <Icon name="arrow" size={20} />
             <Text style={styles.back}>INDIETRO</Text>
           </Pressable>
           <Text style={styles.title}>Dizionario dei segnali</Text>

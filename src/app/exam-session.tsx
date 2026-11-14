@@ -4,7 +4,7 @@ import { Alert, Platform, Pressable, ScrollView, Text, View } from 'react-native
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { GridBackground } from '@/components/GridBackground';
-import { PixelIcon } from '@/components/PixelIcon';
+import { Icon } from '@/components/Icon';
 import { RetroButton } from '@/components/RetroButton';
 import { RoadSign } from '@/components/RoadSign';
 import { chapterById } from '@/data/chapters';
@@ -95,7 +95,7 @@ export default function ExamSession() {
         <Pressable
           hitSlop={12}
           onPress={() => confirm('Abbandonare la prova?', 'I progressi di questa simulazione andranno persi.', () => router.back())}>
-          <PixelIcon name="close" size={26} />
+          <Icon name="close" size={26} />
         </Pressable>
         <Text style={styles.counter}>
           Domanda {index + 1}/{questions.length}
@@ -125,7 +125,7 @@ export default function ExamSession() {
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <View style={[styles.inner, { padding: 20, gap: 20 }]}>
           <View style={[styles.kickerBox, { backgroundColor: ch.color }]}>
-            <PixelIcon name={ch.icon} size={16} />
+            <Icon name={ch.icon} size={16} />
             <Text style={styles.kicker}>{ch.short.toUpperCase()}</Text>
           </View>
           {q.sign && (
@@ -160,7 +160,7 @@ export default function ExamSession() {
       <View style={[styles.inner, styles.footer]}>
         <RetroButton
           title=""
-          icon={<PixelIcon name="arrow" size={22} />}
+          icon={<Icon name="arrow" size={22} />}
           variant="surface"
           disabled={index === 0}
           onPress={() => setIndex(index - 1)}
@@ -182,7 +182,7 @@ export default function ExamSession() {
         />
         <RetroButton
           title=""
-          icon={<PixelIcon name="arrow" size={22} flip />}
+          icon={<Icon name="arrow" size={22} flip />}
           variant="surface"
           disabled={index === questions.length - 1}
           onPress={() => setIndex(index + 1)}
@@ -203,7 +203,7 @@ function ExamResult({ questions, answers }: { questions: Question[]; answers: (b
       <GridBackground />
       <ScrollView>
         <View style={[styles.inner, { padding: 20, alignItems: 'center' }]}>
-          <PixelIcon name={passed ? 'cap' : 'book'} size={96} />
+          <Icon name={passed ? 'cap' : 'book'} size={96} />
           <View style={[styles.resultBadge, { backgroundColor: passed ? C.green : C.red }]}>
             <Text style={styles.resultTitle}>{passed ? 'IDONEO!' : 'NON IDONEO'}</Text>
           </View>
@@ -211,7 +211,7 @@ function ExamResult({ questions, answers }: { questions: Question[]; answers: (b
             {wrong.length} {wrong.length === 1 ? 'errore' : 'errori'} su {questions.length} (massimo consentito: {EXAM_MAX_ERRORS})
           </Text>
           <View style={styles.xpRow}>
-            <PixelIcon name="bolt" size={22} />
+            <Icon name="bolt" size={22} />
             <Text style={styles.xp}>+{passed ? 30 : 15} XP</Text>
           </View>
 
@@ -221,7 +221,7 @@ function ExamResult({ questions, answers }: { questions: Question[]; answers: (b
               {wrong.map(({ q, a }) => (
                 <View key={q.id} style={styles.wrongCard}>
                   <View style={styles.wrongChapterRow}>
-                    <PixelIcon name={chapterById(q.chapter).icon} size={16} />
+                    <Icon name={chapterById(q.chapter).icon} size={16} />
                     <Text style={styles.wrongChapter}>{chapterById(q.chapter).short.toUpperCase()}</Text>
                   </View>
                   <View style={{ flexDirection: 'row', gap: 10, alignItems: 'center' }}>

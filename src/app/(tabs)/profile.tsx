@@ -2,7 +2,7 @@ import { router } from 'expo-router';
 import { Alert, Platform, Pressable, Switch, Text, View } from 'react-native';
 import { useShallow } from 'zustand/react/shallow';
 
-import { IconName, PixelIcon } from '@/components/PixelIcon';
+import { Icon, IconName } from '@/components/Icon';
 import { RetroButton } from '@/components/RetroButton';
 import { Screen } from '@/components/Screen';
 import { Window } from '@/components/Window';
@@ -78,7 +78,7 @@ export default function ProfileScreen() {
       {!session ? (
         <Window title="account.exe" color={C.mint} style={styles.mt} bodyStyle={{ gap: 6 }}>
           <View style={styles.titleRow}>
-            <PixelIcon name="cloud" size={24} />
+            <Icon name="cloud" size={24} />
             <Text style={styles.cardTitle}>Salva i tuoi progressi</Text>
           </View>
           <Text style={styles.cardText}>
@@ -98,7 +98,7 @@ export default function ProfileScreen() {
       ) : (
         <Window title="sync.exe" color={sync.status === 'error' ? C.pink : C.mint} style={styles.mt} bodyStyle={{ gap: 6 }}>
           <View style={styles.titleRow}>
-            <PixelIcon name={syncIcon} size={24} />
+            <Icon name={syncIcon} size={24} />
             <Text style={styles.cardTitle}>
               {sync.status === 'syncing' ? 'Sincronizzazione…' : sync.status === 'error' ? 'Errore di sincronizzazione' : 'Progressi sincronizzati'}
             </Text>
@@ -216,7 +216,7 @@ function ThemeSettings() {
           accessibilityState={{ selected: mode === t.mode }}
           style={{ flex: 1 }}>
           <View style={[styles.segmentItem, mode === t.mode && styles.segmentSel]}>
-            <PixelIcon name={t.icon} size={28} />
+            <Icon name={t.icon} size={28} />
             <Text style={[styles.segmentLabel, mode === t.mode && { color: C.onAccent }]}>{t.label}</Text>
           </View>
         </Pressable>
@@ -232,7 +232,7 @@ function IntroSetting() {
   return (
     <Window title="intro.exe" color={C.pink} style={styles.mt}>
       <View style={styles.switchRow}>
-        <PixelIcon name="car" size={28} />
+        <Icon name="car" size={28} />
         <View style={{ flex: 1 }}>
           <Text style={styles.cardTitle}>Animazione all’apertura</Text>
           <Text style={styles.cardText}>Una scena diversa con un’auto ogni volta che apri l’app.</Text>
@@ -280,7 +280,7 @@ function ReminderSettings() {
   return (
     <Window title="promemoria.exe" color={C.orange} style={styles.mt}>
       <View style={styles.switchRow}>
-        <PixelIcon name="bell" size={28} />
+        <Icon name="bell" size={28} />
         <View style={{ flex: 1 }}>
           <Text style={styles.cardTitle}>Ricordami di studiare</Text>
           <Text style={styles.cardText}>Non arriva se hai già raggiunto l’obiettivo di oggi.</Text>
@@ -313,7 +313,7 @@ function Stat({ icon, value, label, color }: { icon: IconName; value: string | n
   return (
     <View style={styles.stat}>
       <View style={[styles.statIcon, { backgroundColor: color }]}>
-        <PixelIcon name={icon} size={24} />
+        <Icon name={icon} size={24} />
       </View>
       <View style={{ flex: 1 }}>
         <Text style={styles.statValue}>{value}</Text>

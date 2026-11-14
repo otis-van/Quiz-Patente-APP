@@ -3,7 +3,7 @@ import { Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { GridBackground } from '@/components/GridBackground';
-import { PixelIcon } from '@/components/PixelIcon';
+import { Icon } from '@/components/Icon';
 import { ProgressBar } from '@/components/ProgressBar';
 import { RetroButton } from '@/components/RetroButton';
 import { RoadSign } from '@/components/RoadSign';
@@ -30,12 +30,12 @@ export default function ChapterScreen() {
       <View style={[styles.header, { backgroundColor: ch.color }]}>
         <View style={styles.inner}>
           <Pressable onPress={() => router.back()} hitSlop={12} style={styles.backRow} accessibilityLabel="Indietro">
-            <PixelIcon name="arrow" size={20} />
+            <Icon name="arrow" size={20} />
             <Text style={styles.back}>INDIETRO</Text>
           </Pressable>
           <View style={styles.headRow}>
             <View style={styles.headIcon}>
-              <PixelIcon name={ch.icon} size={36} />
+              <Icon name={ch.icon} size={36} />
             </View>
             <View style={{ flex: 1 }}>
               <Text style={styles.kicker}>ARGOMENTO {String(ch.id).padStart(2, '0')}</Text>
@@ -87,7 +87,7 @@ export default function ChapterScreen() {
       <View style={[styles.inner, styles.footer]}>
         <RetroButton
           title="Esercitati"
-          icon={<PixelIcon name="star" size={18} />}
+          icon={<Icon name="star" size={18} />}
           onPress={() => router.push({ pathname: '/quiz', params: { mode: 'lesson', chapter: ch.id } })}
         />
       </View>

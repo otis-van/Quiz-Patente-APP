@@ -2,14 +2,14 @@ import { Tabs } from 'expo-router/js-tabs';
 import { View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { IconName, PixelIcon } from '@/components/PixelIcon';
+import { Icon, IconName } from '@/components/Icon';
 import { F, makeStyles, useColors } from '@/theme';
 
 function TabIcon({ icon, focused }: { icon: IconName; focused: boolean }) {
   const styles = useStyles();
   return (
     <View style={[styles.icon, focused && styles.iconFocused]}>
-      <PixelIcon name={icon} size={24} />
+      <Icon name={icon} size={24} />
     </View>
   );
 }

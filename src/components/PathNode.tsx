@@ -1,6 +1,6 @@
 import { Pressable, Text, View } from 'react-native';
 
-import { IconName, PixelIcon } from '@/components/PixelIcon';
+import { Icon, IconName } from '@/components/Icon';
 import { haptic } from '@/lib/haptics';
 import { F, hardShadow, makeStyles, useColors } from '@/theme';
 
@@ -43,7 +43,7 @@ export function PathNode({ state, color, icon, offset, onPress, label }: Props) 
               state === 'locked' && styles.locked,
               state !== 'locked' && (pressed ? { transform: [{ translateX: 5 }, { translateY: 5 }] } : hardShadow(C, 5)),
             ]}>
-            <PixelIcon name={icon} size={36} dim={state === 'locked'} />
+            <Icon name={icon} size={36} dim={state === 'locked'} />
           </View>
         )}
       </Pressable>
