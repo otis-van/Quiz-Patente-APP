@@ -7,6 +7,7 @@ import { GridBackground } from '@/components/GridBackground';
 import { Icon } from '@/components/Icon';
 import { RetroButton } from '@/components/RetroButton';
 import { RoadSign } from '@/components/RoadSign';
+import { FooterBar } from '@/components/FooterBar';
 import { chapterById } from '@/data/chapters';
 import { Question } from '@/data/questions';
 import { haptic } from '@/lib/haptics';
@@ -93,7 +94,7 @@ export default function ExamSession() {
   const ch = chapterById(q.chapter);
 
   return (
-    <SafeAreaView style={styles.root}>
+    <SafeAreaView style={styles.root} edges={['top', 'left', 'right']}>
       <GridBackground />
       <View style={[styles.inner, styles.top]}>
         <Pressable
@@ -161,7 +162,7 @@ export default function ExamSession() {
         </View>
       </ScrollView>
 
-      <View style={[styles.inner, styles.footer]}>
+      <FooterBar style={styles.footerRow}>
         <RetroButton
           title=""
           icon={<Icon name="arrow" size={22} />}
@@ -192,7 +193,7 @@ export default function ExamSession() {
           onPress={() => setIndex(index + 1)}
           style={{ width: 64 }}
         />
-      </View>
+      </FooterBar>
     </SafeAreaView>
   );
 }
@@ -203,7 +204,7 @@ function ExamResult({ questions, answers }: { questions: Question[]; answers: (b
   const wrong = questions.map((q, i) => ({ q, a: answers[i] })).filter(({ q, a }) => a !== q.answer);
   const passed = wrong.length <= EXAM_MAX_ERRORS;
   return (
-    <SafeAreaView style={styles.root}>
+    <SafeAreaView style={styles.root} edges={['top', 'left', 'right']}>
       <GridBackground />
       <ScrollView>
         <View style={[styles.inner, { padding: 20, alignItems: 'center' }]}>
@@ -243,9 +244,9 @@ function ExamResult({ questions, answers }: { questions: Question[]; answers: (b
           )}
         </View>
       </ScrollView>
-      <View style={[styles.inner, styles.footer]}>
+      <FooterBar style={styles.footerRow}>
         <RetroButton title="Continua" style={{ flex: 1 }} onPress={() => router.back()} />
-      </View>
+      </FooterBar>
     </SafeAreaView>
   );
 }
@@ -297,7 +298,7 @@ const useStyles = makeStyles((C) => ({
   },
   vfLetter: { fontFamily: F.black, fontSize: 36, color: C.text },
   vfLabel: { fontFamily: F.pixel, fontSize: 13, color: C.textLight },
-  footer: { flexDirection: 'row', gap: 12, padding: 16, borderTopWidth: 2, borderTopColor: C.ink, backgroundColor: C.surface },
+  footerRow: { flexDirection: 'row', gap: 12 },
   resultBadge: { ...boxed(C), paddingHorizontal: 16, paddingVertical: 6, marginTop: 16 },
   resultTitle: { fontFamily: F.pixelBold, fontSize: 28, color: C.onAccent },
   resultSub: { fontFamily: F.regular, fontSize: 16, color: C.textLight, marginTop: 14, textAlign: 'center' },

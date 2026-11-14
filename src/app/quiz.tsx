@@ -1,13 +1,14 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { GridBackground } from '@/components/GridBackground';
 import { Icon, IconName } from '@/components/Icon';
 import { ProgressBar } from '@/components/ProgressBar';
 import { RetroButton } from '@/components/RetroButton';
 import { RoadSign } from '@/components/RoadSign';
+import { FooterBar } from '@/components/FooterBar';
 import { chapterById } from '@/data/chapters';
 import { Question } from '@/data/questions';
 import { haptic } from '@/lib/haptics';
@@ -24,6 +25,7 @@ interface Item {
 }
 
 export default function QuizScreen() {
+  const insets = useSafeAreaInsets();
   useOpenSound();
   const C = useColors();
   const styles = useStyles();
@@ -118,7 +120,7 @@ export default function QuizScreen() {
   if (summary) {
     const { xp, accuracy, secs } = summary;
     return (
-      <SafeAreaView style={styles.root}>
+      <SafeAreaView style={styles.root} edges={['top', 'left', 'right']}>
         <GridBackground />
         <View style={[styles.inner, styles.center, { flex: 1 }]}>
           <Icon name={accuracy === 100 ? 'trophy' : accuracy >= 70 ? 'sparkle' : 'heart'} size={96} />
@@ -132,15 +134,15 @@ export default function QuizScreen() {
             <Tile label="TEMPO" icon="clock" value={`${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, '0')}`} color={C.blue} />
           </View>
         </View>
-        <View style={[styles.inner, styles.footer]}>
+        <FooterBar>
           <RetroButton title="Continua" onPress={() => router.back()} />
-        </View>
+        </FooterBar>
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView style={styles.root}>
+    <SafeAreaView style={styles.root} edges={['top', 'left', 'right']}>
       <GridBackground />
       <View style={[styles.inner, styles.topBar]}>
         <Pressable onPress={() => router.back()} hitSlop={12} accessibilityLabel="Chiudi">
@@ -197,7 +199,7 @@ export default function QuizScreen() {
       </ScrollView>
 
       {checked ? (
-        <View style={[styles.sheet, { backgroundColor: isCorrect ? C.green : C.red }]}>
+        <View style={[styles.sheet, { backgroundColor: isCorrect ? C.green : C.red, paddingBottom: 24 + insets.bottom }]}>
           <View style={styles.inner}>
             <View style={styles.sheetHead}>
               <Icon name={isCorrect ? 'check' : 'cross'} size={30} />
@@ -209,9 +211,9 @@ export default function QuizScreen() {
           </View>
         </View>
       ) : (
-        <View style={[styles.inner, styles.footer]}>
+        <FooterBar>
           <RetroButton title="Verifica" variant="lime" disabled={selected === null} onPress={check} />
-        </View>
+        </FooterBar>
       )}
     </SafeAreaView>
   );
@@ -301,7 +303,6 @@ const useStyles = makeStyles((C) => ({
     paddingHorizontal: 16,
   },
   choiceText: { fontFamily: F.pixel, fontSize: 18 },
-  footer: { padding: 16, borderTopWidth: 2, borderTopColor: C.ink, backgroundColor: C.surface },
   sheet: { padding: 16, paddingBottom: 24, borderTopWidth: 2, borderTopColor: C.ink },
   sheetHead: { flexDirection: 'row', alignItems: 'center', gap: 10, flexWrap: 'wrap' },
   sheetTitle: { fontFamily: F.black, fontSize: 21, color: C.onAccent },

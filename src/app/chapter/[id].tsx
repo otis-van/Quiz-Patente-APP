@@ -7,6 +7,7 @@ import { Icon } from '@/components/Icon';
 import { ProgressBar } from '@/components/ProgressBar';
 import { RetroButton } from '@/components/RetroButton';
 import { RoadSign } from '@/components/RoadSign';
+import { FooterBar } from '@/components/FooterBar';
 import { chapterById } from '@/data/chapters';
 import { questionsOfChapter } from '@/data/questions';
 import { chapterMastery, mastery, useProgress } from '@/store/progress';
@@ -27,7 +28,7 @@ export default function ChapterScreen() {
   if (!ch) return null;
 
   return (
-    <SafeAreaView style={styles.root}>
+    <SafeAreaView style={styles.root} edges={['top', 'left', 'right']}>
       <GridBackground />
       <View style={[styles.header, { backgroundColor: ch.color }]}>
         <View style={styles.inner}>
@@ -86,13 +87,13 @@ export default function ChapterScreen() {
           </View>
         </View>
       </ScrollView>
-      <View style={[styles.inner, styles.footer]}>
+      <FooterBar>
         <RetroButton
           title="Esercitati"
           icon={<Icon name="star" size={18} />}
           onPress={() => router.push({ pathname: '/quiz', params: { mode: 'lesson', chapter: ch.id } })}
         />
-      </View>
+      </FooterBar>
     </SafeAreaView>
   );
 }
@@ -128,5 +129,4 @@ const useStyles = makeStyles((C) => ({
   legendRow: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 12, marginTop: 10 },
   legendItem: { flexDirection: 'row', alignItems: 'center', gap: 5 },
   legend: { fontFamily: F.regular, color: C.muted, fontSize: 12 },
-  footer: { padding: 16, borderTopWidth: 2, borderTopColor: C.ink, backgroundColor: C.surface },
 }));
