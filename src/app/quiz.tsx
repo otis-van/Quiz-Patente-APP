@@ -177,7 +177,7 @@ export default function QuizScreen() {
             </View>
           )}
           <View style={styles.questionRow}>
-            <Icon name="trafficLight" size={56} />
+            <QuestionBadge seed={items[0]?.q.id ?? ''} index={index} />
             <View style={styles.speech}>
               <Text style={styles.question}>{current.q.text}</Text>
             </View>
@@ -216,6 +216,29 @@ export default function QuizScreen() {
         </FooterBar>
       )}
     </SafeAreaView>
+  );
+}
+
+/** Icone "compagne" della domanda: cambiano a ogni domanda, senza ripetersi di fila. */
+const BADGE_ICONS: IconName[] = ['panda', 'cone', 'signpost', 'wheel', 'bulb', 'gauge', 'shield', 'idCard', 'star', 'bolt', 'heart', 'sparkle', 'question', 'road', 'parking', 'car'];
+
+function hashId(id: string) {
+  let h = 2166136261;
+  for (let i = 0; i < id.length; i++) h = Math.imul(h ^ id.charCodeAt(i), 16777619) >>> 0;
+  return h;
+}
+
+function QuestionBadge({ seed, index }: { seed: string; index: number }) {
+  const C = useColors();
+  const styles = useStyles();
+  const h = hashId(seed);
+  const colors = [C.yellow, C.pink, C.mint, C.lilac, C.blue, C.lime, C.orange];
+  const icon = BADGE_ICONS[(h + index * 5) % BADGE_ICONS.length];
+  const color = colors[((h >>> 4) + index * 3) % colors.length];
+  return (
+    <View style={[styles.badge, { backgroundColor: color, transform: [{ rotate: `${(index % 3) * 4 - 4}deg` }] }]}>
+      <Icon name={icon} size={38} />
+    </View>
   );
 }
 
@@ -288,7 +311,17 @@ const useStyles = makeStyles((C) => ({
     paddingVertical: 3,
   },
   kicker: { fontFamily: F.pixel, fontSize: 11, color: C.onAccent },
-  questionRow: { flexDirection: 'row', alignItems: 'flex-end', gap: 10 },
+  questionRow: { flexDirection: 'row', alignItems: 'flex-end', gap: 12 },
+  badge: {
+    width: 58,
+    height: 58,
+    borderRadius: 16,
+    borderWidth: 2,
+    borderColor: C.ink,
+    alignItems: 'center',
+    justifyContent: 'center',
+    ...hardShadow(C, 4),
+  },
   signCard: { ...boxed(C), alignSelf: 'center', padding: 14, backgroundColor: C.white },
   speech: { ...boxed(C), flex: 1, backgroundColor: C.surface, padding: 16 },
   question: { fontFamily: F.bold, fontSize: 19, color: C.text, lineHeight: 27 },
