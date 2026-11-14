@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { Animated, Easing, Image, Platform, Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
-import { Icon } from '@/components/Icon';
 import { CarModel, carAspect, PerspectiveCar } from '@/components/PerspectiveCar';
 import { playSound, stopSound } from '@/lib/sounds';
 import { useSettings } from '@/store/settings';
@@ -49,6 +48,7 @@ const CAR_COLORS: [string, string][] = [
 
 const MODELS: CarModel[] = ['boxy', 'bubble'];
 const GRAIN = require('../../assets/images/grain.png');
+const LOGO = require('../../assets/images/logo.png');
 
 const BACKGROUNDS: [string, string][] = [
   ['pink', '#F6A6DA'],
@@ -279,10 +279,7 @@ export function IntroAnimation({ onDone }: { onDone: () => void }) {
               </View>
             </View>
             <View style={styles.body}>
-              <View style={styles.logoRow}>
-                <Icon name="panda" size={46} />
-                <Text style={styles.logo}>PATENTE.B</Text>
-              </View>
+              <Image source={LOGO} style={{ width: winW - 48, height: (winW - 48) * (307 / 1169), alignSelf: 'center' }} resizeMode="contain" />
               {variant.trafficLight ? (
                 <TrafficLight t={t} />
               ) : (

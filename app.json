@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Quiz Patente B",
+    "name": "Spatentato",
     "slug": "quiz-patente-b",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -8,7 +8,6 @@
     "scheme": "quizpatente",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "icon": "./assets/expo.icon",
       "bundleIdentifier": "com.quizpatente.app",
       "supportsTablet": true
     },
@@ -25,7 +24,7 @@
     "web": {
       "output": "single",
       "favicon": "./assets/images/favicon.png",
-      "name": "Quiz Patente B"
+      "name": "Spatentato"
     },
     "plugins": [
       "expo-router",
@@ -34,7 +33,7 @@
         {
           "backgroundColor": "#FFF3DC",
           "image": "./assets/images/splash-icon.png",
-          "imageWidth": 76
+          "imageWidth": 240
         }
       ],
       [

@@ -1,4 +1,4 @@
-# 🚗 Quiz Patente B
+# 🚗 Spatentato — Quiz Patente B
 
 App per prepararsi all'esame teorico della **patente B**, con un'esperienza ispirata a Duolingo:
 percorso a livelli, XP, serie di giorni consecutivi, missioni giornaliere e simulazioni d'esame.

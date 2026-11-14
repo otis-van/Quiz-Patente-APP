@@ -1,5 +1,5 @@
 import { router } from 'expo-router';
-import { Pressable, Text, View } from 'react-native';
+import { Image, Pressable, Text, View } from 'react-native';
 import { useShallow } from 'zustand/react/shallow';
 
 import { PathNode, NodeState } from '@/components/PathNode';
@@ -14,6 +14,8 @@ import { questionsOfChapter } from '@/data/questions';
 import { chapterMastery, useProgress } from '@/store/progress';
 import { boxed, F, hardShadow, pressIn, makeStyles, useColors } from '@/theme';
 
+const LOGO = require('../../../assets/images/logo.png');
+
 const OFFSETS = [0, 48, 72, 48, 0, -48, -72, -48];
 
 export default function PathScreen() {
@@ -27,10 +29,7 @@ export default function PathScreen() {
       header={
         <StatsBar
           left={
-            <View style={styles.brandRow}>
-              <Icon name="panda" size={38} />
-              <Text style={styles.brand}>PATENTE.B</Text>
-            </View>
+            <Image source={LOGO} style={styles.logo} resizeMode="contain" accessibilityLabel="Spatentato" />
           }
         />
       }>
@@ -118,8 +117,7 @@ function Unit({ chapter }: { chapter: Chapter }) {
 }
 
 const useStyles = makeStyles((C) => ({
-  brandRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  brand: { fontFamily: F.pixelBold, fontSize: 16, color: C.text },
+  logo: { width: 137, height: 36 },
   continueRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   continueIcon: { ...boxed(C, 0), width: 52, height: 52, alignItems: 'center', justifyContent: 'center' },
   continueLabel: { fontFamily: F.regular, color: C.textLight, fontSize: 13 },
