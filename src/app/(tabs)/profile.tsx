@@ -235,7 +235,7 @@ function IntroSetting() {
         <Icon name="car" size={28} />
         <View style={{ flex: 1 }}>
           <Text style={styles.cardTitle}>Animazione all’apertura</Text>
-          <Text style={styles.cardText}>Una scena diversa con un’auto ogni volta che apri l’app.</Text>
+          <Text style={styles.cardText}>La finestra «patente.exe» che si apre, in una variante diversa ogni volta.</Text>
         </View>
         <Switch
           value={on}
