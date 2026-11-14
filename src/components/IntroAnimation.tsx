@@ -46,8 +46,12 @@ const MINI = {
   gialla: require('../../assets/intro/mini-gialla.png'),
   menta: require('../../assets/intro/mini-menta.png'),
 };
-const PANDA_ASPECT = 882 / 1193;
-const MINI_ASPECT = 884 / 1113;
+const PANDA_ASPECT = 488 / 640;
+const MINI_ASPECT = 477 / 640;
+const SMOKE = [
+  { src: require('../../assets/intro/smoke0.png'), aspect: 289 / 520, tip: { x: 0.01, y: 0.97 } },
+  { src: require('../../assets/intro/smoke1.png'), aspect: 265 / 272, tip: { x: 0.015, y: 0.96 } },
+];
 const GRAIN = require('../../assets/images/grain.png');
 const LOGO = require('../../assets/images/logo.png');
 
@@ -168,8 +172,8 @@ export function IntroAnimation({ onDone }: { onDone: () => void }) {
   const mw = pw * 0.94;
   const cars = [
     // la Panda sulla corsia più in alto, la Mini su quella più in basso e un po' più indietro
-    { key: 'panda', src: look.panda, w: pw, h: pw * PANDA_ASPECT, n: -half * 0.42, TS: [0.02, 0.3, 0.6, 0.9], lag: 0 },
-    { key: 'mini', src: look.mini, w: mw, h: mw * MINI_ASPECT, n: half * 0.5, TS: [0.06, 0.36, 0.64, 0.96], lag: 0.12 },
+    { key: 'panda', src: look.panda, w: pw, h: pw * PANDA_ASPECT, n: -half * 0.42, TS: [0.02, 0.3, 0.6, 0.9], lag: 0, smoke: SMOKE[0], smokeW: pw * 1.6, rear: { x: 0.93, y: 0.52 } },
+    { key: 'mini', src: look.mini, w: mw, h: mw * MINI_ASPECT, n: half * 0.5, TS: [0.06, 0.36, 0.64, 0.96], lag: 0.12, smoke: SMOKE[1], smokeW: mw * 1.0, rear: { x: 0.96, y: 0.34 } },
   ].map((c, i) => {
     const s = lerp(t, c.TS, [-D, -c.w * (0.1 + c.lag), c.w * (0.06 - c.lag), D]);
     const base = at(0, c.n);
@@ -218,6 +222,24 @@ export function IntroAnimation({ onDone }: { onDone: () => void }) {
 
         {cars.map((car) => (
           <View key={car.key} style={StyleSheet.absoluteFill} pointerEvents="none">
+            {/* nuvola di fumo che esce dal retro e si allarga */}
+            <Animated.Image
+              source={car.smoke.src}
+              style={{
+                position: 'absolute',
+                left: car.rear.x * car.w - car.smoke.tip.x * car.smokeW,
+                top: car.rear.y * car.h - car.smoke.tip.y * car.smokeW * car.smoke.aspect,
+                width: car.smokeW,
+                height: car.smokeW * car.smoke.aspect,
+                transformOrigin: `${car.smoke.tip.x * 100}% ${car.smoke.tip.y * 100}%`,
+                opacity: lerp(t, [car.TS[0] + 0.06, car.TS[0] + 0.14, car.TS[3] - 0.08, car.TS[3]], [0, 1, 1, 0]),
+                transform: [
+                  { translateX: car.x },
+                  { translateY: car.y },
+                  { scale: lerp(t, [car.TS[0] + 0.06, car.TS[1] + 0.05, car.TS[2], car.TS[3]], [0.25, 1, 1.08, 1.25]) },
+                ],
+              }}
+            />
             {whoosh.map((l, i) => {
               const len = l.len * car.w;
               const ax = -DIR.x * car.w * l.off + NRM.x * l.n * car.h;
