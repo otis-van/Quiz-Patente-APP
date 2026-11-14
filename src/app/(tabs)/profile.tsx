@@ -193,6 +193,8 @@ export default function ProfileScreen() {
           )
         }
       />
+
+      <Text style={styles.madeBy}>Made by OTIS</Text>
     </Screen>
   );
 }
@@ -350,6 +352,7 @@ function Stat({ icon, value, label, color }: { icon: IconName; value: string | n
 
 const useStyles = makeStyles((C) => ({
   mt: { marginTop: 14 },
+  madeBy: { fontFamily: F.pixel, fontSize: 12, color: C.muted, textAlign: 'center', marginTop: 20, letterSpacing: 1 },
   header: { alignItems: 'center', paddingTop: 28, paddingBottom: 8, gap: 4 },
   avatar: {
     width: 96,
