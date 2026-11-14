@@ -1,60 +1,53 @@
 /**
  * I 25 argomenti del programma ministeriale per l'esame teorico della patente B.
  */
+import type { IconName } from '@/components/PixelIcon';
+
 export interface Chapter {
   id: number;
   title: string;
   short: string;
-  emoji: string;
+  icon: IconName;
   color: string;
-  colorDark: string;
 }
 
-const palette: [string, string][] = [
-  ['#58CC02', '#58A700'],
-  ['#1CB0F6', '#1899D6'],
-  ['#CE82FF', '#A568CC'],
-  ['#FF9600', '#CD7900'],
-  ['#FF4B4B', '#EA2B2B'],
-  ['#2B70C9', '#1F5AA6'],
-  ['#00CD9C', '#00A47D'],
+/** Accenti pastello (gli stessi in tema chiaro e scuro). */
+const palette = ['#C9B5FF', '#9DEBDC', '#FFD54A', '#FF9ECF', '#8DB9FF', '#D4F25A', '#FFA866'];
+
+const raw: [string, string, IconName][] = [
+  ['Definizioni generali e doveri nell’uso della strada', 'Definizioni', 'book'],
+  ['Segnali di pericolo', 'Pericolo', 'warning'],
+  ['Segnali di divieto', 'Divieto', 'noEntry'],
+  ['Segnali di obbligo', 'Obbligo', 'mandatory'],
+  ['Segnali di precedenza', 'Precedenza', 'yield'],
+  ['Segnaletica orizzontale e segni sugli ostacoli', 'Segnaletica orizzontale', 'road'],
+  ['Segnalazioni semaforiche e degli agenti del traffico', 'Semafori e agenti', 'trafficLight'],
+  ['Segnali di indicazione', 'Indicazione', 'signpost'],
+  ['Segnali complementari, temporanei e di cantiere', 'Cantieri', 'cone'],
+  ['Pannelli integrativi dei segnali', 'Pannelli integrativi', 'panel'],
+  ['Limiti di velocità, pericolo e intralcio alla circolazione', 'Velocità', 'gauge'],
+  ['Distanza di sicurezza', 'Distanza di sicurezza', 'arrows'],
+  ['Norme sulla circolazione dei veicoli', 'Circolazione', 'car'],
+  ['Ordine di precedenza agli incroci', 'Incroci', 'crossroad'],
+  ['Norme sul sorpasso', 'Sorpasso', 'overtake'],
+  ['Fermata, sosta, arresto e partenza', 'Fermata e sosta', 'parking'],
+  ['Norme varie: autostrade, traino, veicolo fermo, spie', 'Norme varie', 'wheel'],
+  ['Uso delle luci, dei dispositivi acustici e dei proiettori', 'Luci e clacson', 'bulb'],
+  ['Cinture, sistemi di ritenuta per bambini e casco', 'Cinture e casco', 'shield'],
+  ['Patenti, sanzioni, documenti e obblighi verso gli agenti', 'Patenti e sanzioni', 'idCard'],
+  ['Incidenti stradali e comportamento in caso di incidente', 'Incidenti', 'aid'],
+  ['Condizioni fisiche e psichiche, alcol, droghe e primo soccorso', 'Alcol e salute', 'glass'],
+  ['Responsabilità civile, penale e assicurazione', 'Assicurazione', 'doc'],
+  ['Consumi, ambiente e inquinamento', 'Ambiente', 'leaf'],
+  ['Elementi del veicolo, manutenzione e stabilità', 'Veicolo', 'drop'],
 ];
 
-const raw: [string, string, string][] = [
-  ['Definizioni generali e doveri nell’uso della strada', 'Definizioni', '🛣️'],
-  ['Segnali di pericolo', 'Pericolo', '⚠️'],
-  ['Segnali di divieto', 'Divieto', '⛔'],
-  ['Segnali di obbligo', 'Obbligo', '🔵'],
-  ['Segnali di precedenza', 'Precedenza', '🛑'],
-  ['Segnaletica orizzontale e segni sugli ostacoli', 'Segnaletica orizzontale', '〰️'],
-  ['Segnalazioni semaforiche e degli agenti del traffico', 'Semafori e agenti', '🚦'],
-  ['Segnali di indicazione', 'Indicazione', '🪧'],
-  ['Segnali complementari, temporanei e di cantiere', 'Cantieri', '🚧'],
-  ['Pannelli integrativi dei segnali', 'Pannelli integrativi', '🔲'],
-  ['Limiti di velocità, pericolo e intralcio alla circolazione', 'Velocità', '⏱️'],
-  ['Distanza di sicurezza', 'Distanza di sicurezza', '↔️'],
-  ['Norme sulla circolazione dei veicoli', 'Circolazione', '🚗'],
-  ['Ordine di precedenza agli incroci', 'Incroci', '✖️'],
-  ['Norme sul sorpasso', 'Sorpasso', '⏩'],
-  ['Fermata, sosta, arresto e partenza', 'Fermata e sosta', '🅿️'],
-  ['Norme varie: autostrade, traino, veicolo fermo, spie', 'Norme varie', '🛞'],
-  ['Uso delle luci, dei dispositivi acustici e dei proiettori', 'Luci e clacson', '💡'],
-  ['Cinture, sistemi di ritenuta per bambini e casco', 'Cinture e casco', '🪢'],
-  ['Patenti, sanzioni, documenti e obblighi verso gli agenti', 'Patenti e sanzioni', '🪪'],
-  ['Incidenti stradali e comportamento in caso di incidente', 'Incidenti', '🚑'],
-  ['Condizioni fisiche e psichiche, alcol, droghe e primo soccorso', 'Alcol e salute', '🍷'],
-  ['Responsabilità civile, penale e assicurazione', 'Assicurazione', '📄'],
-  ['Consumi, ambiente e inquinamento', 'Ambiente', '🌱'],
-  ['Elementi del veicolo, manutenzione e stabilità', 'Veicolo', '🔧'],
-];
-
-export const CHAPTERS: Chapter[] = raw.map(([title, short, emoji], i) => ({
+export const CHAPTERS: Chapter[] = raw.map(([title, short, icon], i) => ({
   id: i + 1,
   title,
   short,
-  emoji,
-  color: palette[i % palette.length][0],
-  colorDark: palette[i % palette.length][1],
+  icon,
+  color: palette[i % palette.length],
 }));
 
 export const chapterById = (id: number) => CHAPTERS[id - 1];

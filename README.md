@@ -5,6 +5,10 @@ percorso a livelli, XP, serie di giorni consecutivi, missioni giornaliere e simu
 Funziona su **iOS, Android** (e web) ed è **sincronizzata tramite account**, così puoi iniziare
 sul telefono e continuare sul tablet.
 
+**Stile:** Y2K / neo-brutalista — sfondo crema (tema chiaro) o grigio (tema scuro), contorni neri
+con ombre nette, accenti pastello, riquadri a "finestra" da vecchio sistema operativo, icone in
+pixel art (`src/components/PixelIcon.tsx`) e font Space Grotesk, Space Mono e Silkscreen.
+
 ## Funzionalità
 
 | Sezione | Cosa contiene |
@@ -94,7 +98,7 @@ src/
     auth.tsx         accesso / registrazione
     chapter/[id].tsx guida dell'argomento
     signs.tsx        dizionario dei segnali
-  components/        UI in stile Duolingo (bottoni 3D, nodi del percorso, barre) e segnali SVG
+  components/        UI Y2K (bottoni, finestre, icone pixel, nodi del percorso, barre) e segnali SVG
   data/              argomenti e banca domande
   lib/               logica quiz, sincronizzazione, Supabase, date
   store/             stato dei progressi e autenticazione

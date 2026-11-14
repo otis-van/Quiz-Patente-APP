@@ -1,14 +1,15 @@
 import { Tabs } from 'expo-router/js-tabs';
-import { Text, View } from 'react-native';
+import { View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { IconName, PixelIcon } from '@/components/PixelIcon';
 import { F, makeStyles, useColors } from '@/theme';
 
-function TabIcon({ emoji, focused }: { emoji: string; focused: boolean }) {
+function TabIcon({ icon, focused }: { icon: IconName; focused: boolean }) {
   const styles = useStyles();
   return (
     <View style={[styles.icon, focused && styles.iconFocused]}>
-      <Text style={{ fontSize: 24, opacity: focused ? 1 : 0.55 }}>{emoji}</Text>
+      <PixelIcon name={icon} size={24} />
     </View>
   );
 }
@@ -16,35 +17,43 @@ function TabIcon({ emoji, focused }: { emoji: string; focused: boolean }) {
 export default function TabsLayout() {
   const C = useColors();
   const insets = useSafeAreaInsets();
-  const tab = (title: string, emoji: string) => ({
+  const tab = (title: string, icon: IconName) => ({
     title,
-    tabBarIcon: ({ focused }: { focused: boolean }) => <TabIcon emoji={emoji} focused={focused} />,
+    tabBarIcon: ({ focused }: { focused: boolean }) => <TabIcon icon={icon} focused={focused} />,
   });
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: C.blue,
-        tabBarInactiveTintColor: C.gray,
-        tabBarLabelStyle: { fontFamily: F.bold, fontSize: 11 },
+        tabBarActiveTintColor: C.text,
+        tabBarInactiveTintColor: C.muted,
+        tabBarLabelStyle: { fontFamily: F.pixel, fontSize: 10, marginTop: 2 },
         tabBarStyle: {
-          backgroundColor: C.bg,
+          backgroundColor: C.surface,
           borderTopWidth: 2,
-          borderTopColor: C.grayLight,
-          height: 64 + insets.bottom,
+          borderTopColor: C.ink,
+          height: 68 + insets.bottom,
           paddingTop: 6,
           paddingBottom: insets.bottom + 6,
         },
       }}>
-      <Tabs.Screen name="index" options={tab('Percorso', '🏠')} />
-      <Tabs.Screen name="daily" options={tab('Oggi', '📅')} />
-      <Tabs.Screen name="exam" options={tab('Esame', '📝')} />
-      <Tabs.Screen name="profile" options={tab('Profilo', '👤')} />
+      <Tabs.Screen name="index" options={tab('Percorso', 'home')} />
+      <Tabs.Screen name="daily" options={tab('Oggi', 'calendar')} />
+      <Tabs.Screen name="exam" options={tab('Esame', 'doc')} />
+      <Tabs.Screen name="profile" options={tab('Profilo', 'smiley')} />
     </Tabs>
   );
 }
 
 const useStyles = makeStyles((C) => ({
-  icon: { width: 44, height: 34, borderRadius: 12, alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: 'transparent' },
-  iconFocused: { backgroundColor: C.blueLight, borderColor: C.blueBorder },
+  icon: {
+    width: 46,
+    height: 34,
+    borderRadius: 6,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: 'transparent',
+  },
+  iconFocused: { backgroundColor: C.yellow, borderColor: C.ink, boxShadow: `2px 2px 0px ${C.ink}` },
 }));

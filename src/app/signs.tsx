@@ -2,8 +2,10 @@ import { router } from 'expo-router';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { GridBackground } from '@/components/GridBackground';
+import { PixelIcon } from '@/components/PixelIcon';
 import { RoadSign, SignId, SIGNS } from '@/components/RoadSign';
-import { F, makeStyles, MAX_WIDTH } from '@/theme';
+import { boxed, F, makeStyles, MAX_WIDTH } from '@/theme';
 
 const GROUPS: { title: string; ids: SignId[] }[] = [
   { title: 'Pericolo', ids: ['curva_dx', 'curva_sx', 'doppia_curva_dx', 'dosso', 'strettoia', 'semaforo_pericolo', 'incrocio_dx', 'pl_barriere', 'pl_senza', 'sdrucciolevole', 'bambini', 'discesa', 'altri_pericoli', 'lavori'] },
@@ -21,17 +23,23 @@ export default function SignsScreen() {
   const styles = useStyles();
   return (
     <SafeAreaView style={styles.root}>
-      <View style={[styles.inner, styles.top]}>
-        <Pressable onPress={() => router.back()} hitSlop={12}>
-          <Text style={styles.back}>‹ Indietro</Text>
-        </Pressable>
-        <Text style={styles.title}>Dizionario dei segnali</Text>
+      <GridBackground />
+      <View style={styles.topWrap}>
+        <View style={[styles.inner, styles.top]}>
+          <Pressable onPress={() => router.back()} hitSlop={12} style={styles.backRow} accessibilityLabel="Indietro">
+            <PixelIcon name="arrow" size={20} />
+            <Text style={styles.back}>INDIETRO</Text>
+          </Pressable>
+          <Text style={styles.title}>Dizionario dei segnali</Text>
+        </View>
       </View>
       <ScrollView>
         <View style={[styles.inner, { padding: 16 }]}>
           {GROUPS.map((g) => (
             <View key={g.title} style={{ marginBottom: 24 }}>
-              <Text style={styles.section}>{g.title}</Text>
+              <View style={styles.sectionBox}>
+                <Text style={styles.section}>{g.title}</Text>
+              </View>
               <View style={styles.grid}>
                 {g.ids.map((id) => (
                   <View key={id} style={styles.cell}>
@@ -51,20 +59,31 @@ export default function SignsScreen() {
 const useStyles = makeStyles((C) => ({
   root: { flex: 1, backgroundColor: C.bg },
   inner: { width: '100%', maxWidth: MAX_WIDTH, alignSelf: 'center' },
-  top: { padding: 16, borderBottomWidth: 2, borderBottomColor: C.grayLight, gap: 8 },
-  back: { fontFamily: F.bold, color: C.blue, fontSize: 16 },
+  topWrap: { borderBottomWidth: 2, borderBottomColor: C.ink, backgroundColor: C.surface },
+  top: { padding: 16, gap: 10 },
+  backRow: { flexDirection: 'row', alignItems: 'center', gap: 6, alignSelf: 'flex-start' },
+  back: { fontFamily: F.pixel, color: C.text, fontSize: 13 },
   title: { fontFamily: F.black, color: C.text, fontSize: 24 },
-  section: { fontFamily: F.black, color: C.text, fontSize: 19, marginBottom: 10 },
-  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
+  sectionBox: {
+    alignSelf: 'flex-start',
+    backgroundColor: C.yellow,
+    borderWidth: 2,
+    borderColor: C.ink,
+    borderRadius: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    marginBottom: 12,
+  },
+  section: { fontFamily: F.pixel, color: C.onAccent, fontSize: 14 },
+  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
   cell: {
-    width: '31%',
+    ...boxed(C, 3),
+    width: '30%',
     flexGrow: 1,
     alignItems: 'center',
     gap: 6,
     padding: 10,
-    borderWidth: 2,
-    borderColor: C.grayLight,
-    borderRadius: 16,
+    backgroundColor: C.surface,
   },
   name: { fontFamily: F.bold, color: C.textLight, fontSize: 12, textAlign: 'center' },
 }));

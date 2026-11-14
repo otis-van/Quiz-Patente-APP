@@ -2,16 +2,18 @@ import { router } from 'expo-router';
 import { Pressable, Text, View } from 'react-native';
 import { useShallow } from 'zustand/react/shallow';
 
-import { DuoButton } from '@/components/DuoButton';
+import { IconName, PixelIcon } from '@/components/PixelIcon';
 import { ProgressBar } from '@/components/ProgressBar';
+import { RetroButton } from '@/components/RetroButton';
 import { RoadSign } from '@/components/RoadSign';
 import { Screen } from '@/components/Screen';
 import { StatsBar } from '@/components/StatsBar';
+import { Window } from '@/components/Window';
 import { CHAPTERS } from '@/data/chapters';
 import { dayKey } from '@/lib/date';
 import { DAILY_SIZE } from '@/lib/quiz';
 import { mistakeIds, todayXp, useProgress } from '@/store/progress';
-import { F, makeStyles, useColors } from '@/theme';
+import { boxed, F, makeStyles, useColors } from '@/theme';
 
 const EMPTY: number[] = [];
 
@@ -29,110 +31,117 @@ export default function DailyScreen() {
     })),
   );
 
-  const quests = [
-    { icon: '⚡', title: `Guadagna ${goal} XP`, value: xp, target: goal },
-    { icon: '📅', title: 'Completa 3 esercizi del giorno', value: doneToday.length, target: 3 },
-    { icon: '📝', title: 'Fai una simulazione d’esame', value: examsToday, target: 1 },
+  const quests: { icon: IconName; title: string; value: number; target: number }[] = [
+    { icon: 'bolt', title: `Guadagna ${goal} XP`, value: xp, target: goal },
+    { icon: 'calendar', title: 'Completa 3 esercizi del giorno', value: doneToday.length, target: 3 },
+    { icon: 'doc', title: 'Fai una simulazione d’esame', value: examsToday, target: 1 },
   ];
 
   const dateLabel = new Date().toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long' });
 
   return (
-    <Screen header={<StatsBar left={<Text style={styles.headerTitle}>Oggi</Text>} />}>
+    <Screen header={<StatsBar left={<Text style={styles.headerTitle}>OGGI</Text>} />}>
       <Text style={styles.date}>{dateLabel}</Text>
 
-      <Text style={styles.section}>Missioni del giorno</Text>
-      <View style={styles.card}>
+      <Window title="missioni_del_giorno.exe" color={C.lilac} style={{ marginTop: 14 }} bodyStyle={{ padding: 0 }}>
         {quests.map((q, i) => (
           <View key={q.title} style={[styles.quest, i > 0 && styles.questBorder]}>
-            <Text style={styles.questIcon}>{q.icon}</Text>
+            <PixelIcon name={q.icon} size={30} />
             <View style={{ flex: 1, gap: 6 }}>
               <Text style={styles.questTitle}>{q.title}</Text>
               <View style={styles.questBarRow}>
-                <ProgressBar value={q.value / q.target} color={C.yellow} height={14} />
+                <ProgressBar value={q.value / q.target} color={C.yellow} height={16} />
                 <Text style={styles.questCount}>
                   {Math.min(q.value, q.target)}/{q.target}
                 </Text>
               </View>
             </View>
-            <Text style={styles.chest}>{q.value >= q.target ? '🎁' : '📦'}</Text>
+            <PixelIcon name={q.value >= q.target ? 'gift' : 'box'} size={30} />
           </View>
         ))}
-      </View>
+      </Window>
 
       <View style={styles.quickRow}>
         <QuickCard
-          emoji="🎯"
+          icon="target"
           title="Allenamento rapido"
           subtitle="10 domande sui tuoi punti deboli"
           color={C.blue}
           onPress={() => router.push({ pathname: '/quiz', params: { mode: 'practice' } })}
         />
         <QuickCard
-          emoji="🔁"
+          icon="heart"
           title="Ripassa errori"
-          subtitle={mistakes ? `${mistakes} domande da ripassare` : 'Nessun errore 🎉'}
-          color={C.red}
+          subtitle={mistakes ? `${mistakes} domande da ripassare` : 'Nessun errore, grande!'}
+          color={C.pink}
           onPress={() => router.push({ pathname: '/quiz', params: { mode: 'review' } })}
         />
       </View>
 
-      <Pressable onPress={() => router.push('/signs')} style={{ marginTop: 12 }}>
+      <Pressable onPress={() => router.push('/signs')} style={{ marginTop: 14 }}>
         {({ pressed }) => (
-          <View style={[styles.signsCard, { borderBottomWidth: pressed ? 2 : 5, marginTop: pressed ? 3 : 0 }]}>
-            <RoadSign id="stop" size={44} />
+          <View style={[styles.signsCard, pressed && styles.pressed]}>
+            <View style={styles.signBox}>
+              <RoadSign id="stop" size={40} />
+            </View>
             <View style={{ flex: 1 }}>
-              <Text style={[styles.quickTitle, { color: C.purple }]}>Dizionario dei segnali</Text>
+              <Text style={styles.quickTitle}>Dizionario dei segnali</Text>
               <Text style={styles.quickSub}>Tutti i segnali illustrati, divisi per categoria</Text>
             </View>
-            <Text style={styles.go}>›</Text>
+            <PixelIcon name="chevron" size={20} />
           </View>
         )}
       </Pressable>
 
-      <Text style={styles.section}>Esercizi del giorno per argomento</Text>
+      <Text style={styles.section}>Esercizi per argomento</Text>
       <Text style={styles.hint}>
         Ogni giorno {DAILY_SIZE} domande nuove per ciascuno dei 25 argomenti. Completati oggi: {doneToday.length}/25
       </Text>
-      <View style={{ gap: 10 }}>
+      <View style={{ gap: 12 }}>
         {CHAPTERS.map((ch) => {
           const done = doneToday.includes(ch.id);
           return (
             <Pressable
               key={ch.id}
-              onPress={() => router.push({ pathname: '/quiz', params: { mode: 'daily', chapter: ch.id } })}
-              style={({ pressed }) => [styles.row, done && styles.rowDone, pressed && { opacity: 0.7 }]}>
-              <View style={[styles.rowIcon, { backgroundColor: done ? C.yellow : ch.color }]}>
-                <Text style={{ fontSize: 22 }}>{ch.emoji}</Text>
-              </View>
-              <View style={{ flex: 1 }}>
-                <Text style={styles.rowKicker}>ARGOMENTO {ch.id}</Text>
-                <Text style={styles.rowTitle}>{ch.short}</Text>
-              </View>
-              {done ? <Text style={styles.check}>✓</Text> : <Text style={styles.go}>›</Text>}
+              onPress={() => router.push({ pathname: '/quiz', params: { mode: 'daily', chapter: ch.id } })}>
+              {({ pressed }) => (
+                <View style={[styles.row, done && { backgroundColor: C.yellow }, pressed && styles.pressed]}>
+                  <View style={[styles.rowIcon, { backgroundColor: ch.color }]}>
+                    <PixelIcon name={ch.icon} size={26} />
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={[styles.rowKicker, done && { color: C.onAccent }]}>
+                      ARGOMENTO {String(ch.id).padStart(2, '0')}
+                    </Text>
+                    <Text style={[styles.rowTitle, done && { color: C.onAccent }]}>{ch.short}</Text>
+                  </View>
+                  {done ? <PixelIcon name="check" size={24} /> : <PixelIcon name="chevron" size={20} />}
+                </View>
+              )}
             </Pressable>
           );
         })}
       </View>
-      <DuoButton
+      <RetroButton
         title="Simulazione d’esame"
-        variant="purple"
-        style={{ marginTop: 20 }}
+        variant="lilac"
+        icon={<PixelIcon name="doc" size={20} />}
+        style={{ marginTop: 22 }}
         onPress={() => router.push('/exam-session')}
       />
     </Screen>
   );
 }
 
-function QuickCard(p: { emoji: string; title: string; subtitle: string; color: string; onPress: () => void }) {
+function QuickCard(p: { icon: IconName; title: string; subtitle: string; color: string; onPress: () => void }) {
   const styles = useStyles();
   return (
     <Pressable onPress={p.onPress} style={{ flex: 1 }}>
       {({ pressed }) => (
-        <View style={[styles.quick, { borderBottomWidth: pressed ? 2 : 5, marginTop: pressed ? 3 : 0 }]}>
-          <Text style={{ fontSize: 30 }}>{p.emoji}</Text>
-          <Text style={[styles.quickTitle, { color: p.color }]}>{p.title}</Text>
-          <Text style={styles.quickSub}>{p.subtitle}</Text>
+        <View style={[styles.quick, { backgroundColor: p.color }, pressed && styles.pressed]}>
+          <PixelIcon name={p.icon} size={34} />
+          <Text style={[styles.quickTitle, styles.onAccent]}>{p.title}</Text>
+          <Text style={[styles.quickSub, styles.onAccent]}>{p.subtitle}</Text>
         </View>
       )}
     </Pressable>
@@ -140,37 +149,42 @@ function QuickCard(p: { emoji: string; title: string; subtitle: string; color: s
 }
 
 const useStyles = makeStyles((C) => ({
-  headerTitle: { fontFamily: F.black, fontSize: 20, color: C.text },
-  date: { fontFamily: F.bold, color: C.gray, fontSize: 15, marginTop: 16, textTransform: 'capitalize' },
-  section: { fontFamily: F.black, fontSize: 21, color: C.text, marginTop: 22, marginBottom: 10 },
-  hint: { fontFamily: F.regular, color: C.textLight, fontSize: 14, marginTop: -4, marginBottom: 12 },
-  card: { borderWidth: 2, borderColor: C.grayLight, borderRadius: 16 },
+  headerTitle: { fontFamily: F.pixelBold, fontSize: 18, color: C.text },
+  date: { fontFamily: F.mono, color: C.textLight, fontSize: 14, marginTop: 18, textTransform: 'capitalize' },
+  section: { fontFamily: F.black, fontSize: 22, color: C.text, marginTop: 28, marginBottom: 6 },
+  hint: { fontFamily: F.regular, color: C.textLight, fontSize: 14, marginBottom: 14 },
   quest: { flexDirection: 'row', alignItems: 'center', padding: 14, gap: 12 },
-  questBorder: { borderTopWidth: 2, borderTopColor: C.grayLight },
-  questIcon: { fontSize: 30 },
-  questTitle: { fontFamily: F.bold, color: C.text, fontSize: 16 },
+  questBorder: { borderTopWidth: 2, borderTopColor: C.ink, borderStyle: 'dashed' },
+  questTitle: { fontFamily: F.bold, color: C.text, fontSize: 15 },
   questBarRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  questCount: { fontFamily: F.bold, color: C.gray, fontSize: 13, width: 40, textAlign: 'right' },
-  chest: { fontSize: 28 },
-  quickRow: { flexDirection: 'row', gap: 12, marginTop: 16 },
-  quick: { borderWidth: 2, borderColor: C.grayLight, borderRadius: 16, padding: 14, gap: 4, minHeight: 130 },
-  signsCard: { flexDirection: 'row', alignItems: 'center', gap: 12, borderWidth: 2, borderColor: C.grayLight, borderRadius: 16, padding: 12 },
-  quickTitle: { fontFamily: F.black, fontSize: 16 },
-  quickSub: { fontFamily: F.regular, color: C.textLight, fontSize: 13 },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
+  questCount: { fontFamily: F.black, color: C.text, fontSize: 13, width: 40, textAlign: 'right' },
+  quickRow: { flexDirection: 'row', gap: 14, marginTop: 18 },
+  quick: { ...boxed(C), padding: 14, gap: 6, minHeight: 140 },
+  onAccent: { color: C.onAccent },
+  pressed: { transform: [{ translateX: 4 }, { translateY: 4 }], boxShadow: 'none' },
+  signsCard: { ...boxed(C), backgroundColor: C.surface, flexDirection: 'row', alignItems: 'center', gap: 12, padding: 12 },
+  signBox: {
+    width: 56,
+    height: 56,
+    borderRadius: 6,
     borderWidth: 2,
-    borderColor: C.grayLight,
-    borderBottomWidth: 4,
-    borderRadius: 16,
-    padding: 10,
+    borderColor: C.ink,
+    backgroundColor: C.white,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  rowDone: { backgroundColor: C.yellowLight, borderColor: C.yellowBorder },
-  rowIcon: { width: 46, height: 46, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
-  rowKicker: { fontFamily: F.bold, color: C.gray, fontSize: 11, letterSpacing: 0.6 },
+  quickTitle: { fontFamily: F.bold, fontSize: 16, color: C.text },
+  quickSub: { fontFamily: F.regular, color: C.textLight, fontSize: 13 },
+  row: { ...boxed(C, 3), backgroundColor: C.surface, flexDirection: 'row', alignItems: 'center', gap: 12, padding: 10 },
+  rowIcon: {
+    width: 46,
+    height: 46,
+    borderRadius: 6,
+    borderWidth: 2,
+    borderColor: C.ink,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  rowKicker: { fontFamily: F.pixel, color: C.muted, fontSize: 10 },
   rowTitle: { fontFamily: F.bold, color: C.text, fontSize: 16 },
-  check: { fontFamily: F.black, color: C.yellowDark, fontSize: 24, paddingHorizontal: 8 },
-  go: { fontFamily: F.black, color: C.gray, fontSize: 28, paddingHorizontal: 8 },
 }));

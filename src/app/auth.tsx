@@ -3,7 +3,10 @@ import { useState } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { DuoButton } from '@/components/DuoButton';
+import { GridBackground } from '@/components/GridBackground';
+import { PixelIcon } from '@/components/PixelIcon';
+import { RetroButton } from '@/components/RetroButton';
+import { Window } from '@/components/Window';
 import { useAuth } from '@/store/auth';
 import { F, makeStyles, useColors } from '@/theme';
 
@@ -33,11 +36,12 @@ export default function AuthScreen() {
 
   return (
     <SafeAreaView style={styles.root}>
+      <GridBackground />
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
         <View style={styles.inner}>
           <View style={styles.top}>
             <Pressable onPress={() => router.back()} hitSlop={12}>
-              <Text style={styles.close}>✕</Text>
+              <PixelIcon name="close" size={26} />
             </Pressable>
             <Pressable onPress={() => setMode(signup ? 'signin' : 'signup')}>
               <Text style={styles.switch}>{signup ? 'ACCEDI' : 'REGISTRATI'}</Text>
@@ -49,12 +53,12 @@ export default function AuthScreen() {
             {signup ? 'Salva i progressi e continua su tutti i tuoi dispositivi.' : 'Bentornato! Riprendi da dove avevi lasciato.'}
           </Text>
 
-          <View style={styles.form}>
+          <Window title={signup ? 'nuovo_utente.exe' : 'login.exe'} color={C.lilac} style={{ marginTop: 24 }} bodyStyle={styles.form}>
             {signup && (
               <TextInput
                 style={[styles.input, styles.inputTop]}
                 placeholder="Nome"
-                placeholderTextColor={C.gray}
+                placeholderTextColor={C.muted}
                 value={name}
                 onChangeText={setName}
                 autoComplete="name"
@@ -63,7 +67,7 @@ export default function AuthScreen() {
             <TextInput
               style={[styles.input, !signup && styles.inputTop]}
               placeholder="Email"
-              placeholderTextColor={C.gray}
+              placeholderTextColor={C.muted}
               value={email}
               onChangeText={setEmail}
               autoCapitalize="none"
@@ -73,20 +77,20 @@ export default function AuthScreen() {
             <TextInput
               style={[styles.input, styles.inputBottom]}
               placeholder="Password (min. 6 caratteri)"
-              placeholderTextColor={C.gray}
+              placeholderTextColor={C.muted}
               value={password}
               onChangeText={setPassword}
               secureTextEntry
               autoComplete={signup ? 'new-password' : 'password'}
               onSubmitEditing={() => valid && submit()}
             />
-          </View>
+          </Window>
 
           {message && <Text style={styles.message}>{message}</Text>}
 
-          <DuoButton
+          <RetroButton
             title={loading ? 'Attendi…' : signup ? 'Crea profilo' : 'Accedi'}
-            variant="blue"
+            variant="yellow"
             disabled={!valid || loading}
             onPress={submit}
             style={{ marginTop: 20 }}
@@ -104,22 +108,23 @@ const useStyles = makeStyles((C) => ({
   root: { flex: 1, backgroundColor: C.bg },
   inner: { width: '100%', maxWidth: 480, alignSelf: 'center', padding: 20 },
   top: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 },
-  close: { fontSize: 24, color: C.gray, fontFamily: F.bold },
-  switch: { fontFamily: F.black, color: C.blue, fontSize: 15, letterSpacing: 0.8 },
-  title: { fontFamily: F.black, fontSize: 28, color: C.text, textAlign: 'center' },
+  switch: { fontFamily: F.pixel, color: C.text, fontSize: 14, textDecorationLine: 'underline' },
+  title: { fontFamily: F.black, fontSize: 26, color: C.text, textAlign: 'center' },
   subtitle: { fontFamily: F.regular, fontSize: 16, color: C.textLight, textAlign: 'center', marginTop: 6 },
-  form: { marginTop: 24, borderWidth: 2, borderColor: C.grayLight, borderRadius: 16, backgroundColor: C.grayBg },
+  form: { gap: 10 },
   input: {
-    fontFamily: F.regular,
-    fontSize: 17,
+    fontFamily: F.mono,
+    fontSize: 16,
     color: C.text,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    borderTopWidth: 2,
-    borderTopColor: C.grayLight,
+    backgroundColor: C.bg,
+    borderWidth: 2,
+    borderColor: C.ink,
+    borderRadius: 4,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
   },
-  inputTop: { borderTopWidth: 0 },
+  inputTop: {},
   inputBottom: {},
-  message: { fontFamily: F.bold, color: C.redText, fontSize: 15, marginTop: 12, textAlign: 'center' },
-  note: { fontFamily: F.regular, color: C.gray, fontSize: 13, textAlign: 'center', marginTop: 16 },
+  message: { fontFamily: F.bold, color: C.redText, fontSize: 15, marginTop: 14, textAlign: 'center' },
+  note: { fontFamily: F.regular, color: C.muted, fontSize: 13, textAlign: 'center', marginTop: 18 },
 }));

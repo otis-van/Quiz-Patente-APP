@@ -3,14 +3,16 @@ import { useEffect, useRef, useState } from 'react';
 import { Alert, Platform, Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { DuoButton } from '@/components/DuoButton';
+import { GridBackground } from '@/components/GridBackground';
+import { PixelIcon } from '@/components/PixelIcon';
+import { RetroButton } from '@/components/RetroButton';
 import { RoadSign } from '@/components/RoadSign';
 import { chapterById } from '@/data/chapters';
 import { Question } from '@/data/questions';
 import { haptic } from '@/lib/haptics';
 import { buildExam, EXAM_MAX_ERRORS, EXAM_SECONDS } from '@/lib/quiz';
 import { useProgress } from '@/store/progress';
-import { F, MAX_WIDTH, makeStyles, useColors } from '@/theme';
+import { boxed, F, hardShadow, MAX_WIDTH, makeStyles, useColors } from '@/theme';
 
 const fmt = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 
@@ -88,17 +90,18 @@ export default function ExamSession() {
 
   return (
     <SafeAreaView style={styles.root}>
+      <GridBackground />
       <View style={[styles.inner, styles.top]}>
         <Pressable
           hitSlop={12}
           onPress={() => confirm('Abbandonare la prova?', 'I progressi di questa simulazione andranno persi.', () => router.back())}>
-          <Text style={styles.close}>✕</Text>
+          <PixelIcon name="close" size={26} />
         </Pressable>
         <Text style={styles.counter}>
           Domanda {index + 1}/{questions.length}
         </Text>
-        <View style={[styles.timer, left < 120 && { backgroundColor: C.redLight, borderColor: C.red }]}>
-          <Text style={[styles.timerText, left < 120 && { color: C.redText }]}>⏱️ {fmt(left)}</Text>
+        <View style={[styles.timer, left < 120 && { backgroundColor: C.red }]}>
+          <Text style={[styles.timerText, left < 120 && { color: C.onAccent }]}>{fmt(left)}</Text>
         </View>
       </View>
 
@@ -112,7 +115,7 @@ export default function ExamSession() {
               answers[i] !== null && styles.cellAnswered,
               i === index && styles.cellCurrent,
             ]}>
-            <Text style={[styles.cellText, (answers[i] !== null || i === index) && { color: i === index ? C.white : C.blueDark }]}>
+            <Text style={[styles.cellText, (answers[i] !== null || i === index) && { color: C.onAccent }]}>
               {i + 1}
             </Text>
           </Pressable>
@@ -121,9 +124,10 @@ export default function ExamSession() {
 
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <View style={[styles.inner, { padding: 20, gap: 20 }]}>
-          <Text style={styles.kicker}>
-            {ch.emoji} {ch.short.toUpperCase()}
-          </Text>
+          <View style={[styles.kickerBox, { backgroundColor: ch.color }]}>
+            <PixelIcon name={ch.icon} size={16} />
+            <Text style={styles.kicker}>{ch.short.toUpperCase()}</Text>
+          </View>
           {q.sign && (
             <View style={styles.signCard}>
               <RoadSign id={q.sign} size={150} />
@@ -139,11 +143,11 @@ export default function ExamSession() {
                     <View
                       style={[
                         styles.vf,
-                        sel && { borderColor: C.blueBorder, backgroundColor: C.blueLight },
-                        { borderBottomWidth: pressed ? 2 : 5, marginTop: pressed ? 3 : 0 },
+                        sel && { backgroundColor: C.yellow },
+                        pressed || sel ? { transform: [{ translateX: 4 }, { translateY: 4 }] } : hardShadow(C, 4),
                       ]}>
-                      <Text style={[styles.vfLetter, sel && { color: C.blueDark }]}>{val ? 'V' : 'F'}</Text>
-                      <Text style={[styles.vfLabel, sel && { color: C.blueDark }]}>{val ? 'VERO' : 'FALSO'}</Text>
+                      <Text style={[styles.vfLetter, sel && { color: C.onAccent }]}>{val ? 'V' : 'F'}</Text>
+                      <Text style={[styles.vfLabel, sel && { color: C.onAccent }]}>{val ? 'VERO' : 'FALSO'}</Text>
                     </View>
                   )}
                 </Pressable>
@@ -154,10 +158,17 @@ export default function ExamSession() {
       </ScrollView>
 
       <View style={[styles.inner, styles.footer]}>
-        <DuoButton title="◀" variant="white" disabled={index === 0} onPress={() => setIndex(index - 1)} style={{ width: 64 }} />
-        <DuoButton
-          title={`Consegna (${answeredCount}/${questions.length})`}
-          variant="blue"
+        <RetroButton
+          title=""
+          icon={<PixelIcon name="arrow" size={22} />}
+          variant="surface"
+          disabled={index === 0}
+          onPress={() => setIndex(index - 1)}
+          style={{ width: 64 }}
+        />
+        <RetroButton
+          title={`Consegna ${answeredCount}/${questions.length}`}
+          variant="lime"
           style={{ flex: 1 }}
           onPress={() =>
             confirm(
@@ -169,9 +180,10 @@ export default function ExamSession() {
             )
           }
         />
-        <DuoButton
-          title="▶"
-          variant="white"
+        <RetroButton
+          title=""
+          icon={<PixelIcon name="arrow" size={22} flip />}
+          variant="surface"
           disabled={index === questions.length - 1}
           onPress={() => setIndex(index + 1)}
           style={{ width: 64 }}
@@ -188,23 +200,30 @@ function ExamResult({ questions, answers }: { questions: Question[]; answers: (b
   const passed = wrong.length <= EXAM_MAX_ERRORS;
   return (
     <SafeAreaView style={styles.root}>
+      <GridBackground />
       <ScrollView>
         <View style={[styles.inner, { padding: 20, alignItems: 'center' }]}>
-          <Text style={{ fontSize: 90 }}>{passed ? '🎓' : '📚'}</Text>
-          <Text style={[styles.resultTitle, { color: passed ? C.green : C.red }]}>{passed ? 'IDONEO!' : 'NON IDONEO'}</Text>
+          <PixelIcon name={passed ? 'cap' : 'book'} size={96} />
+          <View style={[styles.resultBadge, { backgroundColor: passed ? C.green : C.red }]}>
+            <Text style={styles.resultTitle}>{passed ? 'IDONEO!' : 'NON IDONEO'}</Text>
+          </View>
           <Text style={styles.resultSub}>
             {wrong.length} {wrong.length === 1 ? 'errore' : 'errori'} su {questions.length} (massimo consentito: {EXAM_MAX_ERRORS})
           </Text>
-          <Text style={styles.xp}>⚡ +{passed ? 30 : 15} XP</Text>
+          <View style={styles.xpRow}>
+            <PixelIcon name="bolt" size={22} />
+            <Text style={styles.xp}>+{passed ? 30 : 15} XP</Text>
+          </View>
 
           {wrong.length > 0 && (
             <View style={{ alignSelf: 'stretch', marginTop: 24, gap: 12 }}>
               <Text style={styles.sectionTitle}>Rivedi gli errori</Text>
               {wrong.map(({ q, a }) => (
                 <View key={q.id} style={styles.wrongCard}>
-                  <Text style={styles.wrongChapter}>
-                    {chapterById(q.chapter).emoji} {chapterById(q.chapter).short}
-                  </Text>
+                  <View style={styles.wrongChapterRow}>
+                    <PixelIcon name={chapterById(q.chapter).icon} size={16} />
+                    <Text style={styles.wrongChapter}>{chapterById(q.chapter).short.toUpperCase()}</Text>
+                  </View>
                   <View style={{ flexDirection: 'row', gap: 10, alignItems: 'center' }}>
                     {q.sign && <RoadSign id={q.sign} size={56} />}
                     <Text style={[styles.wrongText, { flex: 1 }]}>{q.text}</Text>
@@ -221,7 +240,7 @@ function ExamResult({ questions, answers }: { questions: Question[]; answers: (b
         </View>
       </ScrollView>
       <View style={[styles.inner, styles.footer]}>
-        <DuoButton title="Continua" style={{ flex: 1 }} onPress={() => router.back()} />
+        <RetroButton title="Continua" style={{ flex: 1 }} onPress={() => router.back()} />
       </View>
     </SafeAreaView>
   );
@@ -231,44 +250,59 @@ const useStyles = makeStyles((C) => ({
   root: { flex: 1, backgroundColor: C.bg },
   inner: { width: '100%', maxWidth: MAX_WIDTH, alignSelf: 'center' },
   top: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12, gap: 14 },
-  close: { fontSize: 24, color: C.gray, fontFamily: F.bold },
-  counter: { flex: 1, fontFamily: F.bold, color: C.text, fontSize: 16 },
-  timer: { borderWidth: 2, borderColor: C.grayLight, borderRadius: 12, paddingHorizontal: 10, paddingVertical: 4 },
-  timerText: { fontFamily: F.black, color: C.text, fontSize: 16 },
-  grid: { paddingHorizontal: 16, gap: 6, paddingBottom: 8 },
+  counter: { flex: 1, fontFamily: F.pixel, color: C.text, fontSize: 14 },
+  timer: { ...boxed(C, 2), backgroundColor: C.ink, paddingHorizontal: 10, paddingVertical: 4 },
+  timerText: { fontFamily: F.pixel, color: C.lime, fontSize: 16 },
+  grid: { paddingHorizontal: 16, gap: 6, paddingBottom: 10, paddingTop: 2 },
   cell: {
     width: 36,
     height: 36,
-    borderRadius: 10,
+    borderRadius: 4,
     borderWidth: 2,
-    borderColor: C.grayLight,
+    borderColor: C.ink,
+    backgroundColor: C.surface,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  cellAnswered: { backgroundColor: C.blueLight, borderColor: C.blueBorder },
-  cellCurrent: { backgroundColor: C.blue, borderColor: C.blueDark },
-  cellText: { fontFamily: F.bold, color: C.gray, fontSize: 13 },
-  kicker: { fontFamily: F.black, color: C.purple, fontSize: 13, letterSpacing: 0.6 },
-  signCard: { alignSelf: 'center', padding: 14, borderRadius: 20, backgroundColor: C.grayBg, borderWidth: 2, borderColor: C.grayLight },
+  cellAnswered: { backgroundColor: C.lilac },
+  cellCurrent: { backgroundColor: C.yellow, ...hardShadow(C, 2) },
+  cellText: { fontFamily: F.mono, color: C.muted, fontSize: 13 },
+  kickerBox: {
+    alignSelf: 'flex-start',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    borderWidth: 2,
+    borderColor: C.ink,
+    borderRadius: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+  },
+  kicker: { fontFamily: F.pixel, color: C.onAccent, fontSize: 11 },
+  signCard: { ...boxed(C), alignSelf: 'center', padding: 14, backgroundColor: C.white },
   question: { fontFamily: F.bold, fontSize: 21, color: C.text, lineHeight: 30 },
-  vfRow: { flexDirection: 'row', gap: 12 },
+  vfRow: { flexDirection: 'row', gap: 14 },
   vf: {
     borderWidth: 2,
-    borderColor: C.grayLight,
-    borderRadius: 16,
-    paddingVertical: 20,
+    borderColor: C.ink,
+    borderRadius: 6,
+    backgroundColor: C.surface,
+    paddingVertical: 18,
     alignItems: 'center',
     gap: 4,
   },
-  vfLetter: { fontFamily: F.black, fontSize: 34, color: C.text },
-  vfLabel: { fontFamily: F.bold, fontSize: 14, color: C.textLight, letterSpacing: 1 },
-  footer: { flexDirection: 'row', gap: 10, padding: 16, borderTopWidth: 2, borderTopColor: C.grayLight },
-  resultTitle: { fontFamily: F.black, fontSize: 34, marginTop: 8 },
-  resultSub: { fontFamily: F.regular, fontSize: 16, color: C.textLight, marginTop: 6, textAlign: 'center' },
-  xp: { fontFamily: F.black, fontSize: 18, color: C.yellowDark, marginTop: 12 },
-  sectionTitle: { fontFamily: F.black, fontSize: 20, color: C.text },
-  wrongCard: { borderWidth: 2, borderColor: C.grayLight, borderRadius: 16, padding: 14, gap: 6 },
-  wrongChapter: { fontFamily: F.bold, color: C.gray, fontSize: 12 },
+  vfLetter: { fontFamily: F.black, fontSize: 36, color: C.text },
+  vfLabel: { fontFamily: F.pixel, fontSize: 13, color: C.textLight },
+  footer: { flexDirection: 'row', gap: 12, padding: 16, borderTopWidth: 2, borderTopColor: C.ink, backgroundColor: C.surface },
+  resultBadge: { ...boxed(C), paddingHorizontal: 16, paddingVertical: 6, marginTop: 16 },
+  resultTitle: { fontFamily: F.pixelBold, fontSize: 28, color: C.onAccent },
+  resultSub: { fontFamily: F.regular, fontSize: 16, color: C.textLight, marginTop: 14, textAlign: 'center' },
+  xpRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 12 },
+  xp: { fontFamily: F.black, fontSize: 18, color: C.text },
+  sectionTitle: { fontFamily: F.black, fontSize: 21, color: C.text },
+  wrongCard: { ...boxed(C, 3), backgroundColor: C.surface, padding: 14, gap: 8 },
+  wrongChapterRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  wrongChapter: { fontFamily: F.pixel, color: C.muted, fontSize: 11 },
   wrongText: { fontFamily: F.bold, color: C.text, fontSize: 16, lineHeight: 22 },
   wrongAnswer: { fontFamily: F.bold, color: C.textLight, fontSize: 14 },
   wrongExpl: { fontFamily: F.regular, color: C.textLight, fontSize: 14, lineHeight: 20 },

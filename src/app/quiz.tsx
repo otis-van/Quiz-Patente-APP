@@ -3,15 +3,17 @@ import { useMemo, useState } from 'react';
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { DuoButton } from '@/components/DuoButton';
+import { GridBackground } from '@/components/GridBackground';
+import { IconName, PixelIcon } from '@/components/PixelIcon';
 import { ProgressBar } from '@/components/ProgressBar';
+import { RetroButton } from '@/components/RetroButton';
 import { RoadSign } from '@/components/RoadSign';
 import { chapterById } from '@/data/chapters';
 import { Question } from '@/data/questions';
 import { haptic } from '@/lib/haptics';
 import { buildDaily, buildLesson, buildPractice, buildReview, QuizMode, xpForSession } from '@/lib/quiz';
 import { AnswerLog, mistakeIds, useProgress } from '@/store/progress';
-import { F, MAX_WIDTH, makeStyles, useColors } from '@/theme';
+import { boxed, F, hardShadow, MAX_WIDTH, makeStyles, useColors } from '@/theme';
 
 const PRAISE = ['Ottimo!', 'Perfetto!', 'Bravissimo!', 'Esatto!', 'Grande!', 'Continua così!'];
 
@@ -100,10 +102,11 @@ export default function QuizScreen() {
   if (items.length === 0) {
     return (
       <SafeAreaView style={[styles.root, styles.center]}>
-        <Text style={styles.bigEmoji}>🎉</Text>
+        <GridBackground />
+        <PixelIcon name="sparkle" size={88} />
         <Text style={styles.title}>Nessun errore da ripassare!</Text>
         <Text style={styles.subtitle}>Continua con le lezioni per mettere alla prova le tue conoscenze.</Text>
-        <DuoButton title="Torna indietro" onPress={() => router.back()} style={{ alignSelf: 'stretch', margin: 24 }} />
+        <RetroButton title="Torna indietro" onPress={() => router.back()} style={{ alignSelf: 'stretch', margin: 24 }} />
       </SafeAreaView>
     );
   }
@@ -112,20 +115,21 @@ export default function QuizScreen() {
     const { xp, accuracy, secs } = summary;
     return (
       <SafeAreaView style={styles.root}>
+        <GridBackground />
         <View style={[styles.inner, styles.center, { flex: 1 }]}>
-          <Text style={styles.bigEmoji}>{accuracy === 100 ? '🏆' : accuracy >= 70 ? '🎉' : '💪'}</Text>
-          <Text style={[styles.title, { color: C.yellowDark }]}>
+          <PixelIcon name={accuracy === 100 ? 'trophy' : accuracy >= 70 ? 'sparkle' : 'heart'} size={96} />
+          <Text style={[styles.title, { marginTop: 16 }]}>
             {mode === 'lesson' ? 'Lezione completata!' : mode === 'daily' ? 'Esercizio del giorno completato!' : 'Allenamento completato!'}
           </Text>
           {accuracy === 100 && <Text style={styles.subtitle}>Nessun errore: +5 XP bonus!</Text>}
           <View style={styles.tiles}>
-            <Tile label="XP TOTALI" value={`⚡ ${xp}`} color={C.yellow} />
-            <Tile label={accuracy >= 80 ? 'OTTIMO' : 'PRECISIONE'} value={`🎯 ${accuracy}%`} color={C.green} />
-            <Tile label="TEMPO" value={`⏱️ ${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, '0')}`} color={C.blue} />
+            <Tile label="XP" icon="bolt" value={`+${xp}`} color={C.yellow} />
+            <Tile label={accuracy >= 80 ? 'OTTIMO' : 'PRECISIONE'} icon="target" value={`${accuracy}%`} color={C.green} />
+            <Tile label="TEMPO" icon="clock" value={`${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, '0')}`} color={C.blue} />
           </View>
         </View>
         <View style={[styles.inner, styles.footer]}>
-          <DuoButton title="Continua" onPress={() => router.back()} />
+          <RetroButton title="Continua" onPress={() => router.back()} />
         </View>
       </SafeAreaView>
     );
@@ -133,23 +137,33 @@ export default function QuizScreen() {
 
   return (
     <SafeAreaView style={styles.root}>
+      <GridBackground />
       <View style={[styles.inner, styles.topBar]}>
         <Pressable onPress={() => router.back()} hitSlop={12} accessibilityLabel="Chiudi">
-          <Text style={styles.close}>✕</Text>
+          <PixelIcon name="close" size={26} />
         </Pressable>
         <ProgressBar value={progress} />
-        {combo >= 3 && <Text style={styles.combo}>🔥 {combo}</Text>}
+        {combo >= 3 && (
+          <View style={styles.comboBox}>
+            <PixelIcon name="fire" size={18} />
+            <Text style={styles.combo}>{combo}</Text>
+          </View>
+        )}
       </View>
 
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <View style={[styles.inner, { paddingHorizontal: 20, paddingTop: 16, gap: 18 }]}>
           {current.retry ? (
-            <Text style={[styles.kicker, { color: C.orange }]}>🔁 ERRORE PRECEDENTE</Text>
+            <View style={[styles.kickerBox, { backgroundColor: C.orange }]}>
+              <Text style={styles.kicker}>ERRORE PRECEDENTE</Text>
+            </View>
           ) : (
-            <Text style={[styles.kicker, { color: C.purple }]}>
-              {mode === 'daily' ? '📅 ESERCIZIO DEL GIORNO' : '✨ VERO O FALSO?'}
-              {chapter ? ` · ${chapter.short.toUpperCase()}` : ''}
-            </Text>
+            <View style={[styles.kickerBox, { backgroundColor: chapter?.color ?? C.lilac }]}>
+              <Text style={styles.kicker}>
+                {mode === 'daily' ? 'ESERCIZIO DEL GIORNO' : 'VERO O FALSO?'}
+                {chapter ? ` · ${chapter.short.toUpperCase()}` : ''}
+              </Text>
+            </View>
           )}
           {current.q.sign && (
             <View style={styles.signCard}>
@@ -157,7 +171,7 @@ export default function QuizScreen() {
             </View>
           )}
           <View style={styles.questionRow}>
-            <Text style={styles.mascot}>🚦</Text>
+            <PixelIcon name="trafficLight" size={56} />
             <View style={styles.speech}>
               <Text style={styles.question}>{current.q.text}</Text>
             </View>
@@ -167,7 +181,7 @@ export default function QuizScreen() {
               <Choice
                 key={String(val)}
                 label={val ? 'VERO' : 'FALSO'}
-                emoji={val ? '👍' : '👎'}
+                icon={val ? 'check' : 'cross'}
                 selected={selected === val}
                 state={checked ? (val === current.q.answer ? 'right' : selected === val ? 'wrong' : 'none') : 'none'}
                 disabled={checked}
@@ -179,27 +193,20 @@ export default function QuizScreen() {
       </ScrollView>
 
       {checked ? (
-        <View style={[styles.sheet, { backgroundColor: isCorrect ? C.greenLight : C.redLight }]}>
+        <View style={[styles.sheet, { backgroundColor: isCorrect ? C.green : C.red }]}>
           <View style={styles.inner}>
-            <Text style={[styles.sheetTitle, { color: isCorrect ? C.greenText : C.redText }]}>
-              {isCorrect ? `✅ ${praise}` : '❌ Risposta corretta:'}
-            </Text>
-            {!isCorrect && (
-              <Text style={[styles.sheetBody, { color: C.redText, fontFamily: F.bold }]}>
-                {current.q.answer ? 'VERO' : 'FALSO'}
-              </Text>
-            )}
-            {current.q.explanation && (
-              <Text style={[styles.sheetBody, { color: isCorrect ? C.greenText : C.redText }]}>
-                {current.q.explanation}
-              </Text>
-            )}
-            <DuoButton title="Continua" variant={isCorrect ? 'green' : 'red'} onPress={next} style={{ marginTop: 12 }} />
+            <View style={styles.sheetHead}>
+              <PixelIcon name={isCorrect ? 'check' : 'cross'} size={30} />
+              <Text style={styles.sheetTitle}>{isCorrect ? praise : 'Risposta corretta:'}</Text>
+              {!isCorrect && <Text style={styles.sheetAnswer}>{current.q.answer ? 'VERO' : 'FALSO'}</Text>}
+            </View>
+            {current.q.explanation && <Text style={styles.sheetBody}>{current.q.explanation}</Text>}
+            <RetroButton title="Continua" variant="surface" onPress={next} style={{ marginTop: 14 }} />
           </View>
         </View>
       ) : (
         <View style={[styles.inner, styles.footer]}>
-          <DuoButton title="Verifica" disabled={selected === null} onPress={check} />
+          <RetroButton title="Verifica" variant="lime" disabled={selected === null} onPress={check} />
         </View>
       )}
     </SafeAreaView>
@@ -208,14 +215,14 @@ export default function QuizScreen() {
 
 function Choice({
   label,
-  emoji,
+  icon,
   selected,
   state,
   disabled,
   onPress,
 }: {
   label: string;
-  emoji: string;
+  icon: IconName;
   selected: boolean;
   state: 'right' | 'wrong' | 'none';
   disabled: boolean;
@@ -223,42 +230,37 @@ function Choice({
 }) {
   const C = useColors();
   const styles = useStyles();
-  const palette =
-    state === 'right'
-      ? { border: C.green, bg: C.greenLight, fg: C.greenText }
-      : state === 'wrong'
-        ? { border: C.red, bg: C.redLight, fg: C.redText }
-        : selected
-          ? { border: C.blueBorder, bg: C.blueLight, fg: C.blueDark }
-          : { border: C.grayLight, bg: C.bg, fg: C.text };
+  const bg = state === 'right' ? C.green : state === 'wrong' ? C.red : selected ? C.yellow : C.surface;
+  const fg = state !== 'none' || selected ? C.onAccent : C.text;
+  const down = isHeldDown(selected, disabled);
   return (
     <Pressable disabled={disabled} onPress={onPress} accessibilityRole="button" accessibilityState={{ selected }}>
       {({ pressed }) => (
         <View
           style={[
             styles.choice,
-            {
-              borderColor: palette.border,
-              backgroundColor: palette.bg,
-              borderBottomWidth: pressed ? 2 : 5,
-              marginTop: pressed ? 3 : 0,
-            },
+            { backgroundColor: bg },
+            pressed || down ? { transform: [{ translateX: 4 }, { translateY: 4 }] } : hardShadow(C, 4),
           ]}>
-          <Text style={{ fontSize: 26 }}>{emoji}</Text>
-          <Text style={[styles.choiceText, { color: palette.fg }]}>{label}</Text>
+          <PixelIcon name={icon} size={30} />
+          <Text style={[styles.choiceText, { color: fg }]}>{label}</Text>
         </View>
       )}
     </Pressable>
   );
 }
 
-function Tile({ label, value, color }: { label: string; value: string; color: string }) {
+/** Pulsante "premuto" (selezionato): resta abbassato finché non si verifica. */
+const isHeldDown = (selected: boolean, disabled: boolean) => selected && !disabled;
+
+function Tile({ label, value, color, icon }: { label: string; value: string; color: string; icon: IconName }) {
   const styles = useStyles();
   return (
-    <View style={[styles.tile, { backgroundColor: color, borderColor: color }]}>
-      <Text style={styles.tileLabel}>{label}</Text>
+    <View style={styles.tile}>
+      <Text style={[styles.tileLabel, { backgroundColor: color }]}>{label}</Text>
       <View style={styles.tileBody}>
-        <Text style={[styles.tileValue, { color }]}>{value}</Text>
+        <PixelIcon name={icon} size={22} />
+        <Text style={styles.tileValue}>{value}</Text>
       </View>
     </View>
   );
@@ -269,40 +271,60 @@ const useStyles = makeStyles((C) => ({
   inner: { width: '100%', maxWidth: MAX_WIDTH, alignSelf: 'center' },
   center: { alignItems: 'center', justifyContent: 'center', padding: 24 },
   topBar: { flexDirection: 'row', alignItems: 'center', gap: 14, paddingHorizontal: 16, paddingVertical: 12 },
-  close: { fontSize: 24, color: C.gray, fontFamily: F.bold },
-  combo: { fontFamily: F.black, color: C.orange, fontSize: 16 },
-  kicker: { fontFamily: F.black, fontSize: 13, letterSpacing: 0.6 },
-  questionRow: { flexDirection: 'row', alignItems: 'flex-end', gap: 10 },
-  mascot: { fontSize: 54 },
-  signCard: { alignSelf: 'center', padding: 14, borderRadius: 20, backgroundColor: C.grayBg, borderWidth: 2, borderColor: C.grayLight },
-  speech: {
-    flex: 1,
+  comboBox: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  combo: { fontFamily: F.black, color: C.text, fontSize: 16 },
+  kickerBox: {
+    alignSelf: 'flex-start',
     borderWidth: 2,
-    borderColor: C.grayLight,
-    borderRadius: 16,
-    padding: 16,
+    borderColor: C.ink,
+    borderRadius: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
   },
+  kicker: { fontFamily: F.pixel, fontSize: 11, color: C.onAccent },
+  questionRow: { flexDirection: 'row', alignItems: 'flex-end', gap: 10 },
+  signCard: { ...boxed(C), alignSelf: 'center', padding: 14, backgroundColor: C.white },
+  speech: { ...boxed(C), flex: 1, backgroundColor: C.surface, padding: 16 },
   question: { fontFamily: F.bold, fontSize: 19, color: C.text, lineHeight: 27 },
   choice: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 14,
     borderWidth: 2,
-    borderRadius: 16,
-    paddingVertical: 16,
-    paddingHorizontal: 18,
+    borderColor: C.ink,
+    borderRadius: 6,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
   },
-  choiceText: { fontFamily: F.black, fontSize: 18, letterSpacing: 1 },
-  footer: { padding: 16, borderTopWidth: 2, borderTopColor: C.grayLight },
-  sheet: { padding: 16, paddingBottom: 24 },
-  sheetTitle: { fontFamily: F.black, fontSize: 22 },
-  sheetBody: { fontFamily: F.regular, fontSize: 16, marginTop: 4, lineHeight: 22 },
-  bigEmoji: { fontSize: 88, marginBottom: 12 },
-  title: { fontFamily: F.black, fontSize: 26, color: C.text, textAlign: 'center' },
+  choiceText: { fontFamily: F.pixel, fontSize: 18 },
+  footer: { padding: 16, borderTopWidth: 2, borderTopColor: C.ink, backgroundColor: C.surface },
+  sheet: { padding: 16, paddingBottom: 24, borderTopWidth: 2, borderTopColor: C.ink },
+  sheetHead: { flexDirection: 'row', alignItems: 'center', gap: 10, flexWrap: 'wrap' },
+  sheetTitle: { fontFamily: F.black, fontSize: 21, color: C.onAccent },
+  sheetAnswer: {
+    fontFamily: F.pixel,
+    fontSize: 16,
+    color: C.onAccent,
+    backgroundColor: C.white,
+    borderWidth: 2,
+    borderColor: C.ink,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+  },
+  sheetBody: { fontFamily: F.regular, fontSize: 16, marginTop: 8, lineHeight: 22, color: C.onAccent },
+  title: { fontFamily: F.black, fontSize: 25, color: C.text, textAlign: 'center' },
   subtitle: { fontFamily: F.regular, fontSize: 16, color: C.textLight, textAlign: 'center', marginTop: 8 },
-  tiles: { flexDirection: 'row', gap: 10, marginTop: 28, width: '100%' },
-  tile: { flex: 1, borderWidth: 2, borderRadius: 16, overflow: 'hidden' },
-  tileLabel: { fontFamily: F.black, color: C.white, fontSize: 11, textAlign: 'center', paddingVertical: 4 },
-  tileBody: { backgroundColor: C.bg, borderRadius: 14, paddingVertical: 14, alignItems: 'center' },
-  tileValue: { fontFamily: F.black, fontSize: 17 },
+  tiles: { flexDirection: 'row', gap: 12, marginTop: 28, width: '100%' },
+  tile: { ...boxed(C), flex: 1, overflow: 'hidden', backgroundColor: C.surface },
+  tileLabel: {
+    fontFamily: F.pixel,
+    color: C.onAccent,
+    fontSize: 11,
+    textAlign: 'center',
+    paddingVertical: 4,
+    borderBottomWidth: 2,
+    borderBottomColor: C.ink,
+  },
+  tileBody: { paddingVertical: 14, alignItems: 'center', gap: 6 },
+  tileValue: { fontFamily: F.black, fontSize: 18, color: C.text },
 }));

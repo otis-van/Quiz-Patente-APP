@@ -2,37 +2,57 @@ import { router } from 'expo-router';
 import { Pressable, Text, View } from 'react-native';
 import { useShallow } from 'zustand/react/shallow';
 
-import { DuoButton } from '@/components/DuoButton';
 import { PathNode, NodeState } from '@/components/PathNode';
+import { PixelIcon } from '@/components/PixelIcon';
 import { ProgressBar } from '@/components/ProgressBar';
+import { RetroButton } from '@/components/RetroButton';
 import { Screen } from '@/components/Screen';
 import { StatsBar } from '@/components/StatsBar';
+import { Window } from '@/components/Window';
 import { Chapter, CHAPTERS, LESSONS_PER_CHAPTER } from '@/data/chapters';
 import { questionsOfChapter } from '@/data/questions';
 import { chapterMastery, useProgress } from '@/store/progress';
-import { F, makeStyles } from '@/theme';
+import { boxed, F, makeStyles, useColors } from '@/theme';
 
 const OFFSETS = [0, 48, 72, 48, 0, -48, -72, -48];
-const NODE_ICONS = ['★', '★', '★', '🏆'];
 
 export default function PathScreen() {
+  const C = useColors();
   const styles = useStyles();
   const lessonsDone = useProgress((s) => s.lessonsDone);
   const next = CHAPTERS.find((c) => (lessonsDone[c.id] ?? 0) < LESSONS_PER_CHAPTER);
 
   return (
-    <Screen header={<StatsBar left={<Text style={styles.brand}>🚗 Patente B</Text>} />}>
+    <Screen
+      header={
+        <StatsBar
+          left={
+            <View style={styles.brandRow}>
+              <PixelIcon name="car" size={26} />
+              <Text style={styles.brand}>PATENTE.B</Text>
+            </View>
+          }
+        />
+      }>
       {next && (
-        <View style={styles.continueCard}>
-          <Text style={styles.continueLabel}>CONTINUA DA DOVE ERI RIMASTO</Text>
-          <Text style={styles.continueTitle}>
-            {next.emoji} {next.short} · Lezione {(lessonsDone[next.id] ?? 0) + 1}
-          </Text>
-          <DuoButton
+        <Window title="continua.exe" color={C.pink} style={{ marginTop: 20 }} bodyStyle={{ gap: 12 }}>
+          <View style={styles.continueRow}>
+            <View style={[styles.continueIcon, { backgroundColor: next.color }]}>
+              <PixelIcon name={next.icon} size={32} />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.continueLabel}>Riprendi da dove eri rimasto</Text>
+              <Text style={styles.continueTitle}>
+                {next.short} · Lezione {(lessonsDone[next.id] ?? 0) + 1}
+              </Text>
+            </View>
+          </View>
+          <RetroButton
             title="Inizia lezione"
+            icon={<PixelIcon name="star" size={18} />}
             onPress={() => router.push({ pathname: '/quiz', params: { mode: 'lesson', chapter: next.id } })}
           />
-        </View>
+        </Window>
       )}
       {CHAPTERS.map((ch) => (
         <Unit key={ch.id} chapter={ch} />
@@ -52,35 +72,40 @@ function Unit({ chapter }: { chapter: Chapter }) {
 
   return (
     <View style={styles.unit}>
-      <Pressable
-        onPress={() => router.push({ pathname: '/chapter/[id]', params: { id: chapter.id } })}
-        style={[styles.banner, { backgroundColor: chapter.color, borderBottomColor: chapter.colorDark }]}>
-        <View style={{ flex: 1 }}>
-          <Text style={styles.bannerKicker}>ARGOMENTO {chapter.id}</Text>
-          <Text style={styles.bannerTitle}>{chapter.title}</Text>
-          <View style={styles.masteryRow}>
-            <ProgressBar value={mastery} color="rgba(255,255,255,0.95)" height={10} />
-            <Text style={styles.masteryText}>{Math.round(mastery * 100)}%</Text>
+      <Pressable onPress={() => router.push({ pathname: '/chapter/[id]', params: { id: chapter.id } })}>
+        {({ pressed }) => (
+          <View style={[styles.banner, { backgroundColor: chapter.color }, pressed && styles.pressed]}>
+            <View style={styles.bannerIcon}>
+              <PixelIcon name={chapter.icon} size={34} />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.bannerKicker}>ARGOMENTO {String(chapter.id).padStart(2, '0')}</Text>
+              <Text style={styles.bannerTitle}>{chapter.title}</Text>
+              <View style={styles.masteryRow}>
+                <ProgressBar value={mastery} color={chapter.color} height={14} />
+                <Text style={styles.masteryText}>{Math.round(mastery * 100)}%</Text>
+              </View>
+            </View>
+            <View style={styles.guideBtn}>
+              <PixelIcon name="book" size={22} />
+            </View>
           </View>
-        </View>
-        <View style={[styles.guideBtn, { borderColor: chapter.colorDark }]}>
-          <Text style={{ fontSize: 22 }}>📖</Text>
-        </View>
+        )}
       </Pressable>
 
       <View style={styles.path}>
         {Array.from({ length: LESSONS_PER_CHAPTER }, (_, i) => {
           const state: NodeState = i < done ? 'done' : i === done ? 'current' : 'locked';
+          const last = i === LESSONS_PER_CHAPTER - 1;
           const offset = OFFSETS[(i + chapter.id * 2) % OFFSETS.length];
           return (
             <PathNode
               key={i}
               state={state}
               color={chapter.color}
-              colorDark={chapter.colorDark}
-              icon={state === 'done' && i < LESSONS_PER_CHAPTER - 1 ? '✓' : state === 'locked' && i < LESSONS_PER_CHAPTER - 1 ? '🔒' : NODE_ICONS[i]}
+              icon={last ? 'trophy' : state === 'done' ? 'check' : state === 'locked' ? 'lock' : 'star'}
               offset={offset}
-              label={i === LESSONS_PER_CHAPTER - 1 ? 'RIPASSO FINALE' : `LEZIONE ${i + 1}`}
+              label={last ? 'RIPASSO FINALE' : `LEZIONE ${i + 1}`}
               onPress={() => {
                 if (state !== 'locked') start();
               }}
@@ -93,39 +118,39 @@ function Unit({ chapter }: { chapter: Chapter }) {
 }
 
 const useStyles = makeStyles((C) => ({
-  brand: { fontFamily: F.black, fontSize: 18, color: C.green },
-  continueCard: {
-    marginTop: 16,
-    padding: 16,
-    borderRadius: 16,
+  brandRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  brand: { fontFamily: F.pixelBold, fontSize: 16, color: C.text },
+  continueRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  continueIcon: { ...boxed(C, 0), width: 52, height: 52, alignItems: 'center', justifyContent: 'center' },
+  continueLabel: { fontFamily: F.regular, color: C.textLight, fontSize: 13 },
+  continueTitle: { fontFamily: F.black, color: C.text, fontSize: 17 },
+  unit: { marginTop: 28 },
+  banner: { ...boxed(C), padding: 14, flexDirection: 'row', alignItems: 'center', gap: 12 },
+  pressed: { transform: [{ translateX: 4 }, { translateY: 4 }], boxShadow: 'none' },
+  bannerIcon: {
+    width: 50,
+    height: 50,
+    borderRadius: 6,
     borderWidth: 2,
-    borderColor: C.grayLight,
-    gap: 10,
-  },
-  continueLabel: { fontFamily: F.bold, color: C.gray, fontSize: 12, letterSpacing: 0.8 },
-  continueTitle: { fontFamily: F.bold, color: C.text, fontSize: 18 },
-  unit: { marginTop: 24 },
-  banner: {
-    borderRadius: 16,
-    padding: 16,
-    borderBottomWidth: 5,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  bannerKicker: { fontFamily: F.bold, color: 'rgba(255,255,255,0.85)', fontSize: 12, letterSpacing: 1 },
-  bannerTitle: { fontFamily: F.bold, color: C.white, fontSize: 18, marginTop: 2 },
-  masteryRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 10 },
-  masteryText: { fontFamily: F.bold, color: C.white, fontSize: 13, width: 40, textAlign: 'right' },
-  guideBtn: {
-    width: 48,
-    height: 48,
-    borderRadius: 14,
-    borderWidth: 2,
-    borderBottomWidth: 4,
+    borderColor: C.ink,
+    backgroundColor: C.white,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(255,255,255,0.15)',
   },
-  path: { alignItems: 'center', paddingVertical: 12 },
+  bannerKicker: { fontFamily: F.pixel, color: C.onAccent, fontSize: 11, letterSpacing: 0.5 },
+  bannerTitle: { fontFamily: F.bold, color: C.onAccent, fontSize: 17, marginTop: 2, lineHeight: 21 },
+  masteryRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 10 },
+  masteryText: { fontFamily: F.black, color: C.onAccent, fontSize: 13, width: 42, textAlign: 'right' },
+  guideBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 6,
+    borderWidth: 2,
+    borderColor: C.ink,
+    backgroundColor: C.white,
+    alignItems: 'center',
+    justifyContent: 'center',
+    boxShadow: `2px 2px 0px ${C.ink}`,
+  },
+  path: { alignItems: 'center', paddingVertical: 14 },
 }));
