@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
-import { Animated, Easing, Platform, Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { Animated, Easing, Image, Platform, Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
 import { Icon } from '@/components/Icon';
-import { CAR_ASPECT, PerspectiveCar } from '@/components/PerspectiveCar';
+import { CarModel, carAspect, PerspectiveCar } from '@/components/PerspectiveCar';
 import { F, hardShadow, makeStyles, Palette, useColors } from '@/theme';
 
 /**
@@ -42,7 +42,11 @@ const CAR_COLORS: [string, string][] = [
   ['pink', '#FF7FBF'],
   ['teal', '#2EC4B6'],
   ['orange', '#FF8A3D'],
+  ['cream', '#F2E6C9'],
 ];
+
+const MODELS: CarModel[] = ['boxy', 'bubble'];
+const GRAIN = require('../../assets/images/grain.png');
 
 const BACKGROUNDS: [string, string][] = [
   ['pink', '#F6A6DA'],
@@ -75,19 +79,12 @@ const popIn = (t: V, at: number, len = 0.08) => ({
   scale: lerp(t, [at, at + len * 0.6, at + len], [0.3, 1.15, 1]),
 });
 
-/** Interpolazione lineare a tratti in JS (stessa curva usata dall'animazione). */
-const piecewise = (x: number, xs: number[], ys: number[]) => {
-  if (x <= xs[0]) return ys[0];
-  for (let i = 1; i < xs.length; i++) {
-    if (x <= xs[i]) return ys[i - 1] + ((ys[i] - ys[i - 1]) * (x - xs[i - 1])) / (xs[i] - xs[i - 1]);
-  }
-  return ys[ys.length - 1];
-};
-
 // Direzione di marcia sullo schermo (verso il basso a sinistra) e normale.
 const DIR = { x: -Math.cos(Math.PI / 6), y: Math.sin(Math.PI / 6) };
 const NRM = { x: DIR.y, y: -DIR.x }; // verso il basso a destra
 
+const COS30 = Math.cos(Math.PI / 6);
+const SIN30 = Math.sin(Math.PI / 6);
 const BLOCKS = 12;
 
 export function IntroAnimation({ onDone }: { onDone: () => void }) {
@@ -98,22 +95,26 @@ export function IntroAnimation({ onDone }: { onDone: () => void }) {
     // Sul web si può scegliere la variante con ?intro=1..4 (utile per provarle).
     const forced = Platform.OS === 'web' ? Number(new URLSearchParams(globalThis.location?.search).get('intro')) : 0;
     const variant = VARIANTS[forced >= 1 && forced <= VARIANTS.length ? forced - 1 : Math.floor(Math.random() * VARIANTS.length)];
+    const q = Platform.OS === 'web' ? new URLSearchParams(globalThis.location?.search) : null;
     const [carName, car] = pick(CAR_COLORS);
     const bg = pick(BACKGROUNDS.filter(([name]) => name !== carName))[1];
-    return { variant, car, bg };
+    const model = (MODELS as string[]).includes(q?.get('car') ?? '') ? (q!.get('car') as CarModel) : pick(MODELS);
+    const freeze = q?.get('freeze') ? Number(q.get('freeze')) : null;
+    return { variant, car: q?.get('color') ? `#${q.get('color')}` : car, bg, model, freeze };
   });
   const { variant } = look;
-  const [t] = useState(() => new Animated.Value(0));
+  const [t] = useState(() => new Animated.Value(look.freeze ?? 0));
   const [fade] = useState(() => new Animated.Value(1));
   const [closing, setClosing] = useState(false);
 
   useEffect(() => {
+    if (look.freeze !== null) return;
     const anim = Animated.timing(t, { toValue: 1, duration: DURATION, easing: Easing.linear, useNativeDriver: native });
     anim.start(({ finished }) => {
       if (finished) setClosing(true);
     });
     return () => anim.stop();
-  }, [t]);
+  }, [t, look.freeze]);
 
   useEffect(() => {
     if (!closing) return;
@@ -137,8 +138,8 @@ export function IntroAnimation({ onDone }: { onDone: () => void }) {
   const stripe = `${quad(-far, half * 0.35, -stripeW - half * 0.1, stripeW - half * 0.1)} ${quad(-half * 0.35, far, -stripeW + half * 0.25, stripeW + half * 0.25)}`;
 
   /* ---------- Auto ---------- */
-  const cw = Math.min(W * 0.72, 330);
-  const ch = cw * CAR_ASPECT;
+  const cw = Math.min(W * (look.model === 'bubble' ? 0.6 : 0.64), 300);
+  const ch = cw * carAspect(look.model);
   const D = Math.hypot(W, H) * 0.75;
   const TS = [0.06, 0.42, 0.62, 0.96];
   const SS = [-D, -cw * 0.08, cw * 0.08, D];
@@ -147,13 +148,14 @@ export function IntroAnimation({ onDone }: { onDone: () => void }) {
   const carY = Animated.add(cy - ch * 0.62, Animated.multiply(s, DIR.y));
   const bounce = wave(t, 30, 0, -2.5);
 
-  // Nuvole di fumo lasciate dal retro dell'auto (in alto a destra rispetto al centro).
-  const puffs = Array.from({ length: 8 }, (_, k) => {
-    const tk = 0.38 + k * 0.045;
-    const sk = piecewise(tk, TS, SS) - cw * 0.3 - k * 8;
-    const p = at(sk, (k % 2 ? 1 : -1) * half * 0.08);
-    return { tk, x: p.x, y: p.y - ch * 0.08, size: 90 + (k % 3) * 26 };
-  });
+  // Linee di velocità ("whoosh") che seguono l'auto, parallele alla strada.
+  const whoosh = [
+    { n: -0.42, len: 0.8, off: 0.42, w: 3 },
+    { n: -0.22, len: 1.2, off: 0.5, w: 3.5 },
+    { n: -0.02, len: 0.6, off: 0.58, w: 2.5 },
+    { n: 0.18, len: 1.0, off: 0.46, w: 3 },
+    { n: 0.36, len: 0.55, off: 0.55, w: 2.5 },
+  ];
   const stars = [
     { x: W * 0.12, y: H * 0.5, at: 0.3, c: '#FF7FBF' },
     { x: W * 0.82, y: H * 0.46, at: 0.22, c: '#F0554A' },
@@ -179,25 +181,39 @@ export function IntroAnimation({ onDone }: { onDone: () => void }) {
           <Path d={stripe} fill="#FFF1A8" />
         </Svg>
 
-        {puffs.map((p, i) => (
-          <Animated.View
-            key={i}
-            style={{
-              position: 'absolute',
-              left: p.x - p.size / 2,
-              top: p.y - p.size / 2,
-              opacity: lerp(t, [p.tk, p.tk + 0.03, 0.97, 1], [0, 1, 1, 0]),
-              transform: [
-                { scale: lerp(t, [p.tk, p.tk + 0.1], [0.35, 1.2]) },
-                { translateY: lerp(t, [p.tk, 1], [0, -18]) },
-              ],
-            }}>
-            <Puff size={p.size} />
-          </Animated.View>
-        ))}
+        {whoosh.map((l, i) => {
+          // segmento dietro all'auto (in alto a destra), lungo la direzione di marcia
+          const len = l.len * cw;
+          const ax = -DIR.x * cw * l.off + NRM.x * l.n * ch;
+          const ay = -DIR.y * cw * l.off + NRM.y * l.n * ch;
+          return (
+            <Animated.View
+              key={i}
+              style={{
+                position: 'absolute',
+                left: 0,
+                top: 0,
+                opacity: lerp(t, [0.08, 0.14, 0.42, 0.5, 0.62, 0.68, 0.94, 1], [0, 1, 1, 0.6, 0.6, 1, 1, 0]),
+                transform: [
+                  { translateX: Animated.add(carX, cw / 2 + ax) },
+                  { translateY: Animated.add(carY, ch * 0.55 + ay) },
+                ],
+              }}>
+              <Svg width={len * COS30 + 4} height={len * SIN30 + 4} style={{ position: 'absolute', left: -2, top: -len * SIN30 - 2 }}>
+                <Path
+                  d={`M2 ${len * SIN30 + 2} L${len * COS30 + 2} 2`}
+                  stroke={i % 2 ? '#FFFFFF' : INK}
+                  strokeWidth={l.w}
+                  strokeLinecap="round"
+                  strokeDasharray={i === 2 ? '18 10' : undefined}
+                />
+              </Svg>
+            </Animated.View>
+          );
+        })}
 
         <Animated.View style={{ position: 'absolute', left: 0, top: 0, transform: [{ translateX: carX }, { translateY: Animated.add(carY, bounce) }] }}>
-          <PerspectiveCar color={look.car} width={cw} />
+          <PerspectiveCar model={look.model} color={look.car} width={cw} />
         </Animated.View>
 
         {stars.map((st, i) => (
@@ -256,25 +272,13 @@ export function IntroAnimation({ onDone }: { onDone: () => void }) {
           </Animated.View>
         </View>
 
+        <Image source={GRAIN} resizeMode="repeat" style={[StyleSheet.absoluteFill, { width: W, height: H, opacity: 0.9 }]} />
+
         <View style={styles.skip}>
           <Text style={styles.skipText}>TOCCA PER SALTARE</Text>
         </View>
       </Pressable>
     </Animated.View>
-  );
-}
-
-function Puff({ size }: { size: number }) {
-  return (
-    <Svg width={size} height={size * 0.7} viewBox="0 0 60 42">
-      <Path
-        d="M10 38 Q0 38 2 28 Q4 20 12 21 Q12 8 26 8 Q36 2 44 12 Q58 12 57 26 Q60 38 48 38 Z"
-        fill="#FFFDF6"
-        stroke={INK}
-        strokeWidth={2}
-        strokeLinejoin="round"
-      />
-    </Svg>
   );
 }
 
