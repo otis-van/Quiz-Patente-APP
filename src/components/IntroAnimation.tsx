@@ -308,7 +308,6 @@ export function IntroAnimation({ onDone }: { onDone: () => void }) {
             <View style={styles.startBtn}>
               <Text style={styles.startText}>▶ PREMI START</Text>
             </View>
-            <Text style={styles.startHint}>con il volume alzato 🔊</Text>
           </View>
         )}
 
@@ -440,16 +439,4 @@ const useStyles = makeStyles((C) => ({
     ...hardShadow(C, 6),
   },
   startText: { fontFamily: F.pixel, fontSize: 22, color: C.onAccent },
-  startHint: {
-    fontFamily: F.mono,
-    fontSize: 13,
-    color: C.onAccent,
-    backgroundColor: C.white,
-    borderWidth: 2,
-    borderColor: C.ink,
-    borderRadius: 10,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    overflow: 'hidden',
-  },
 }));
