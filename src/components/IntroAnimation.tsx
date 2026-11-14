@@ -299,6 +299,9 @@ export function IntroAnimation({ onDone }: { onDone: () => void }) {
           </Animated.View>
         ))}
 
+        {/* grana solo sull'animazione, non sulla finestra del logo */}
+        <Image source={GRAIN} resizeMode="repeat" style={[StyleSheet.absoluteFill, { width: W, height: H, opacity: 0.9 }]} />
+
         <View style={[styles.center, { top: H * 0.1 }]}>
           <Animated.View
             style={[styles.backWin, { width: winW, opacity: back1.opacity, transform: [{ translateX: 16 }, { translateY: -16 }, { scale: back1.scale }] }]}>
@@ -340,8 +343,6 @@ export function IntroAnimation({ onDone }: { onDone: () => void }) {
             </View>
           </Animated.View>
         </View>
-
-        <Image source={GRAIN} resizeMode="repeat" style={[StyleSheet.absoluteFill, { width: W, height: H, opacity: 0.9 }]} />
 
         {!started && (
           <View style={styles.startWrap} pointerEvents="none">
