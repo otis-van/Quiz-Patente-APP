@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Spatentato",
+    "name": "SPATENTATO - Quiz Patente B",
     "slug": "quiz-patente-b",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -23,7 +23,7 @@
     "web": {
       "output": "single",
       "favicon": "./assets/images/favicon.png",
-      "name": "Spatentato"
+      "name": "SPATENTATO - Quiz Patente B"
     },
     "plugins": [
       "expo-router",

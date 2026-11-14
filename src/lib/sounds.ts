@@ -1,11 +1,13 @@
 import { AudioPlayer, createAudioPlayer, setAudioModeAsync } from 'expo-audio';
 import { useEffect } from 'react';
+import { Platform } from 'react-native';
 
 import { useSettings } from '@/store/settings';
 
 /**
  * Effetti sonori originali (sintetizzati per l'app, nessun diritto di terzi).
- * Rispettano l'interruttore "Suoni" del Profilo e, su iPhone/iPad, il tasto silenzioso.
+ * Rispettano l'interruttore "Effetti sonori" del Profilo; su iPhone/iPad anche il tasto silenzioso,
+ * su Android il volume multimediale.
  */
 const SOURCES = {
   jingle: require('../../assets/sounds/jingle.wav'),
@@ -48,7 +50,9 @@ export function playSound(name: SoundName) {
   try {
     if (!modeSet) {
       modeSet = true;
-      setAudioModeAsync({ playsInSilentMode: false }).catch(() => {});
+      // iPhone/iPad: rispetta il tasto silenzioso. Android: segue il volume multimediale
+      // (in modalità vibrazione o silenziosa le suonerie tacciono, ma i suoni dell'app no).
+      setAudioModeAsync({ playsInSilentMode: Platform.OS !== 'ios' }).catch(() => {});
     }
     const p = player(name);
     p.seekTo(0).catch(() => {});
