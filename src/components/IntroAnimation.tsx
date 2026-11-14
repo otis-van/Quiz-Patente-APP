@@ -5,6 +5,7 @@ import Svg, { Path } from 'react-native-svg';
 import { Icon } from '@/components/Icon';
 import { CarModel, carAspect, PerspectiveCar } from '@/components/PerspectiveCar';
 import { playSound, stopSound } from '@/lib/sounds';
+import { useSettings } from '@/store/settings';
 import { F, hardShadow, makeStyles, Palette, useColors } from '@/theme';
 
 /**
@@ -118,16 +119,25 @@ export function IntroAnimation({ onDone }: { onDone: () => void }) {
   const [t] = useState(() => new Animated.Value(look.freeze ?? 0));
   const [fade] = useState(() => new Animated.Value(1));
   const [closing, setClosing] = useState<null | 'end' | 'skip'>(null);
+  // Sul web il browser blocca l'audio finché non si tocca la pagina: per sentire il jingle
+  // si parte con un "PREMI START" (il suono parte dentro il gesto dell'utente).
+  const [started, setStarted] = useState(
+    () => Platform.OS !== 'web' || look.freeze !== null || !useSettings.getState().soundEnabled,
+  );
+  const start = () => {
+    playSound('jingle');
+    setStarted(true);
+  };
 
   useEffect(() => {
-    if (look.freeze !== null) return;
-    playSound('jingle');
+    if (look.freeze !== null || !started) return;
+    if (Platform.OS !== 'web') playSound('jingle');
     const anim = Animated.timing(t, { toValue: 1, duration: DURATION, easing: Easing.linear, useNativeDriver: native });
     anim.start(({ finished }) => {
       if (finished) setClosing('end');
     });
     return () => anim.stop();
-  }, [t, look.freeze]);
+  }, [t, look.freeze, started]);
 
   useEffect(() => {
     if (!closing) return;
@@ -188,7 +198,10 @@ export function IntroAnimation({ onDone }: { onDone: () => void }) {
 
   return (
     <Animated.View style={[StyleSheet.absoluteFill, styles.root, { opacity: fade, backgroundColor: look.bg }]}>
-      <Pressable style={StyleSheet.absoluteFill} onPress={() => setClosing('skip')} accessibilityLabel="Salta animazione">
+      <Pressable
+        style={StyleSheet.absoluteFill}
+        onPress={() => (started ? setClosing('skip') : start())}
+        accessibilityLabel={started ? 'Salta animazione' : 'Avvia'}>
         <Svg width={W} height={H} style={StyleSheet.absoluteFill}>
           <Path d={curb} fill="#A9A49B" stroke={INK} strokeWidth={2} />
           <Path d={roadPath} fill="#D9D5CE" />
@@ -290,9 +303,24 @@ export function IntroAnimation({ onDone }: { onDone: () => void }) {
 
         <Image source={GRAIN} resizeMode="repeat" style={[StyleSheet.absoluteFill, { width: W, height: H, opacity: 0.9 }]} />
 
-        <View style={styles.skip}>
-          <Text style={styles.skipText}>TOCCA PER SALTARE</Text>
-        </View>
+        {!started && (
+          <View style={styles.startWrap} pointerEvents="none">
+            <View style={styles.startBtn}>
+              <Text style={styles.startText}>▶ PREMI START</Text>
+            </View>
+            <Text style={styles.startHint}>con il volume alzato 🔊</Text>
+          </View>
+        )}
+
+        {started ? (
+          <View style={styles.skip}>
+            <Text style={styles.skipText}>TOCCA PER SALTARE</Text>
+          </View>
+        ) : (
+          <Pressable style={styles.skip} onPress={() => setClosing('skip')} hitSlop={10} accessibilityLabel="Salta animazione">
+            <Text style={styles.skipText}>SALTA</Text>
+          </Pressable>
+        )}
       </Pressable>
     </Animated.View>
   );
@@ -401,4 +429,27 @@ const useStyles = makeStyles((C) => ({
     paddingVertical: 3,
   },
   skipText: { fontFamily: F.pixel, fontSize: 10, color: C.text },
+  startWrap: { position: 'absolute', left: 0, right: 0, top: '42%', alignItems: 'center', gap: 12 },
+  startBtn: {
+    backgroundColor: C.yellow,
+    borderWidth: 3,
+    borderColor: C.ink,
+    borderRadius: 18,
+    paddingHorizontal: 26,
+    paddingVertical: 16,
+    ...hardShadow(C, 6),
+  },
+  startText: { fontFamily: F.pixel, fontSize: 22, color: C.onAccent },
+  startHint: {
+    fontFamily: F.mono,
+    fontSize: 13,
+    color: C.onAccent,
+    backgroundColor: C.white,
+    borderWidth: 2,
+    borderColor: C.ink,
+    borderRadius: 10,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    overflow: 'hidden',
+  },
 }));
