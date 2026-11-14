@@ -10,6 +10,7 @@ import { RoadSign } from '@/components/RoadSign';
 import { chapterById } from '@/data/chapters';
 import { Question } from '@/data/questions';
 import { haptic } from '@/lib/haptics';
+import { playSound } from '@/lib/sounds';
 import { buildExam, EXAM_MAX_ERRORS, EXAM_SECONDS } from '@/lib/quiz';
 import { useProgress } from '@/store/progress';
 import { boxed, F, hardShadow, MAX_WIDTH, makeStyles, useColors } from '@/theme';
@@ -73,11 +74,13 @@ export default function ExamSession() {
     });
     store.addXp(passed ? 30 : 15);
     haptic(passed ? 'success' : 'error');
+    playSound(passed ? 'complete' : 'fail');
     setDone(true);
   }
 
   const answer = (val: boolean) => {
     haptic('light');
+    playSound('tap');
     setAnswers((a) => a.map((x, i) => (i === index ? val : x)));
     if (index + 1 < questions.length) setTimeout(() => setIndex((i) => Math.min(i + 1, questions.length - 1)), 180);
   };

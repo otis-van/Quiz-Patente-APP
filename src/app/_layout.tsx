@@ -10,6 +10,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { IntroAnimation } from '@/components/IntroAnimation';
 import { startReminderScheduler } from '@/lib/reminders';
+import { preloadSounds } from '@/lib/sounds';
 import { startAutoSync } from '@/lib/sync';
 import { useAuth } from '@/store/auth';
 import { useSettings, useSettingsHydrated } from '@/store/settings';
@@ -37,6 +38,7 @@ export default function RootLayout() {
     const stopAuth = useAuth.getState().init();
     const stopSync = startAutoSync();
     const stopReminders = startReminderScheduler();
+    preloadSounds();
     return () => {
       stopAuth();
       stopSync();

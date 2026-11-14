@@ -181,6 +181,7 @@ export default function ProfileScreen() {
       <Text style={styles.section}>Aspetto</Text>
       <ThemeSettings />
       <IntroSetting />
+      <SoundSetting />
 
       <RetroButton
         title="Azzera progressi"
@@ -222,6 +223,30 @@ function ThemeSettings() {
         </Pressable>
       ))}
     </View>
+  );
+}
+
+function SoundSetting() {
+  const C = useColors();
+  const styles = useStyles();
+  const on = useSettings((s) => s.soundEnabled);
+  return (
+    <Window title="suoni.exe" color={C.mint} style={styles.mt}>
+      <View style={styles.switchRow}>
+        <Icon name="bell" size={28} />
+        <View style={{ flex: 1 }}>
+          <Text style={styles.cardTitle}>Effetti sonori</Text>
+          <Text style={styles.cardText}>Jingle d’apertura e suoni per risposte giuste, sbagliate e lezioni completate.</Text>
+        </View>
+        <Switch
+          value={on}
+          onValueChange={(v) => useSettings.getState().setSoundEnabled(v)}
+          trackColor={{ true: C.green, false: C.surfaceAlt }}
+          thumbColor={C.white}
+          ios_backgroundColor={C.surfaceAlt}
+        />
+      </View>
+    </Window>
   );
 }
 

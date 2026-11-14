@@ -11,6 +11,7 @@ import { RoadSign } from '@/components/RoadSign';
 import { chapterById } from '@/data/chapters';
 import { Question } from '@/data/questions';
 import { haptic } from '@/lib/haptics';
+import { playSound } from '@/lib/sounds';
 import { buildDaily, buildLesson, buildPractice, buildReview, QuizMode, xpForSession } from '@/lib/quiz';
 import { AnswerLog, mistakeIds, useProgress } from '@/store/progress';
 import { boxed, F, hardShadow, MAX_WIDTH, makeStyles, useColors } from '@/theme';
@@ -65,6 +66,7 @@ export default function QuizScreen() {
     setPraise(PRAISE[Math.floor(Math.random() * PRAISE.length)]);
     setChecked(true);
     haptic(ok ? 'success' : 'error');
+    playSound(ok ? 'correct' : 'wrong');
     if (ok) setCombo((c) => c + 1);
     else {
       setCombo(0);
@@ -92,6 +94,7 @@ export default function QuizScreen() {
     store.addXp(xp);
     if (mode === 'lesson' && chapterId) store.completeLesson(chapterId);
     if (mode === 'daily' && chapterId) store.completeDaily(chapterId);
+    playSound('complete');
     setSummary({
       xp,
       accuracy: firstCount ? Math.round((correctFirst / firstCount) * 100) : 0,

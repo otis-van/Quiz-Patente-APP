@@ -1,6 +1,7 @@
 import { Pressable, StyleProp, Text, View, ViewStyle } from 'react-native';
 
 import { haptic } from '@/lib/haptics';
+import { playSound } from '@/lib/sounds';
 import { F, hardShadow, makeStyles, Palette, RADIUS, useColors } from '@/theme';
 
 export type Variant = 'yellow' | 'lime' | 'lilac' | 'blue' | 'pink' | 'mint' | 'green' | 'red' | 'surface' | 'ghost';
@@ -30,6 +31,7 @@ export function RetroButton({ title, onPress, variant = 'yellow', disabled, styl
       disabled={disabled}
       onPress={() => {
         haptic('light');
+        playSound('tap');
         onPress?.();
       }}
       style={style}>

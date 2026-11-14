@@ -4,6 +4,7 @@ import Svg, { Path } from 'react-native-svg';
 
 import { Icon } from '@/components/Icon';
 import { CarModel, carAspect, PerspectiveCar } from '@/components/PerspectiveCar';
+import { playSound, stopSound } from '@/lib/sounds';
 import { F, hardShadow, makeStyles, Palette, useColors } from '@/theme';
 
 /**
@@ -116,19 +117,21 @@ export function IntroAnimation({ onDone }: { onDone: () => void }) {
   const { variant } = look;
   const [t] = useState(() => new Animated.Value(look.freeze ?? 0));
   const [fade] = useState(() => new Animated.Value(1));
-  const [closing, setClosing] = useState(false);
+  const [closing, setClosing] = useState<null | 'end' | 'skip'>(null);
 
   useEffect(() => {
     if (look.freeze !== null) return;
+    playSound('jingle');
     const anim = Animated.timing(t, { toValue: 1, duration: DURATION, easing: Easing.linear, useNativeDriver: native });
     anim.start(({ finished }) => {
-      if (finished) setClosing(true);
+      if (finished) setClosing('end');
     });
     return () => anim.stop();
   }, [t, look.freeze]);
 
   useEffect(() => {
     if (!closing) return;
+    if (closing === 'skip') stopSound('jingle');
     Animated.timing(fade, { toValue: 0, duration: 300, useNativeDriver: native }).start(() => onDone());
   }, [closing, fade, onDone]);
 
@@ -185,7 +188,7 @@ export function IntroAnimation({ onDone }: { onDone: () => void }) {
 
   return (
     <Animated.View style={[StyleSheet.absoluteFill, styles.root, { opacity: fade, backgroundColor: look.bg }]}>
-      <Pressable style={StyleSheet.absoluteFill} onPress={() => setClosing(true)} accessibilityLabel="Salta animazione">
+      <Pressable style={StyleSheet.absoluteFill} onPress={() => setClosing('skip')} accessibilityLabel="Salta animazione">
         <Svg width={W} height={H} style={StyleSheet.absoluteFill}>
           <Path d={curb} fill="#A9A49B" stroke={INK} strokeWidth={2} />
           <Path d={roadPath} fill="#D9D5CE" />

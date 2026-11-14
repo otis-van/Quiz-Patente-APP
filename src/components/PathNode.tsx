@@ -2,6 +2,7 @@ import { Pressable, Text, View } from 'react-native';
 
 import { Icon, IconName } from '@/components/Icon';
 import { haptic } from '@/lib/haptics';
+import { playSound } from '@/lib/sounds';
 import { F, hardShadow, makeStyles, useColors } from '@/theme';
 
 export type NodeState = 'done' | 'current' | 'locked';
@@ -33,6 +34,7 @@ export function PathNode({ state, color, icon, offset, onPress, label }: Props) 
         accessibilityLabel={label}
         onPress={() => {
           haptic('light');
+          playSound('tap');
           onPress();
         }}>
         {({ pressed }) => (

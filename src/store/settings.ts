@@ -14,6 +14,9 @@ interface SettingsState {
   /** Animazione con l'auto all'apertura dell'app. */
   introEnabled: boolean;
   setIntroEnabled: (on: boolean) => void;
+  /** Effetti sonori e jingle d'apertura. */
+  soundEnabled: boolean;
+  setSoundEnabled: (on: boolean) => void;
   setThemeMode: (m: ThemeMode) => void;
   setReminder: (r: Partial<Pick<SettingsState, 'reminderEnabled' | 'reminderHour' | 'reminderMinute'>>) => void;
 }
@@ -27,6 +30,8 @@ export const useSettings = create<SettingsState>()(
       reminderMinute: 0,
       introEnabled: true,
       setIntroEnabled: (introEnabled) => set({ introEnabled }),
+      soundEnabled: true,
+      setSoundEnabled: (soundEnabled) => set({ soundEnabled }),
       setThemeMode: (themeMode) => set({ themeMode }),
       setReminder: (r) => set(r),
     }),
