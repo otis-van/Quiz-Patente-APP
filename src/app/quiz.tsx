@@ -11,7 +11,7 @@ import { RoadSign } from '@/components/RoadSign';
 import { chapterById } from '@/data/chapters';
 import { Question } from '@/data/questions';
 import { haptic } from '@/lib/haptics';
-import { playSound } from '@/lib/sounds';
+import { playSound, useOpenSound } from '@/lib/sounds';
 import { buildDaily, buildLesson, buildPractice, buildReview, QuizMode, xpForSession } from '@/lib/quiz';
 import { AnswerLog, mistakeIds, useProgress } from '@/store/progress';
 import { boxed, F, hardShadow, MAX_WIDTH, makeStyles, useColors } from '@/theme';
@@ -24,6 +24,7 @@ interface Item {
 }
 
 export default function QuizScreen() {
+  useOpenSound();
   const C = useColors();
   const styles = useStyles();
   const params = useLocalSearchParams<{ mode?: QuizMode; chapter?: string }>();

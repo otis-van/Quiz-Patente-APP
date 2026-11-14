@@ -1,4 +1,5 @@
 import { AudioPlayer, createAudioPlayer, setAudioModeAsync } from 'expo-audio';
+import { useEffect } from 'react';
 
 import { useSettings } from '@/store/settings';
 
@@ -13,6 +14,8 @@ const SOURCES = {
   wrong: require('../../assets/sounds/wrong.wav'),
   complete: require('../../assets/sounds/complete.wav'),
   fail: require('../../assets/sounds/fail.wav'),
+  tab: require('../../assets/sounds/tab.wav'),
+  open: require('../../assets/sounds/open.wav'),
 };
 
 export type SoundName = keyof typeof SOURCES;
@@ -23,7 +26,7 @@ let modeSet = false;
 function player(name: SoundName) {
   if (!players[name]) {
     const p = createAudioPlayer(SOURCES[name]);
-    p.volume = name === 'tap' ? 0.4 : 0.8;
+    p.volume = name === 'tap' || name === 'tab' ? 0.45 : name === 'open' ? 0.6 : 0.8;
     players[name] = p;
   }
   return players[name];
@@ -31,7 +34,7 @@ function player(name: SoundName) {
 
 /** Carica in anticipo i suoni brevi, così partono senza ritardo. */
 export function preloadSounds() {
-  (['tap', 'correct', 'wrong'] as SoundName[]).forEach((n) => {
+  (['tap', 'tab', 'open', 'correct', 'wrong'] as SoundName[]).forEach((n) => {
     try {
       player(n);
     } catch {
@@ -61,4 +64,11 @@ export function stopSound(name: SoundName) {
   } catch {
     // niente
   }
+}
+
+/** Suono di apertura di una schermata (da chiamare una volta nel componente della schermata). */
+export function useOpenSound() {
+  useEffect(() => {
+    playSound('open');
+  }, []);
 }

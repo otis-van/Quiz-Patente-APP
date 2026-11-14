@@ -6,6 +6,7 @@ import { GridBackground } from '@/components/GridBackground';
 import { Icon } from '@/components/Icon';
 import { RoadSign, SignId, SIGNS } from '@/components/RoadSign';
 import { boxed, F, makeStyles, MAX_WIDTH } from '@/theme';
+import { useOpenSound } from '@/lib/sounds';
 
 const GROUPS: { title: string; ids: SignId[] }[] = [
   { title: 'Pericolo', ids: ['curva_dx', 'curva_sx', 'doppia_curva_dx', 'dosso', 'strettoia', 'semaforo_pericolo', 'incrocio_dx', 'pl_barriere', 'pl_senza', 'sdrucciolevole', 'bambini', 'discesa', 'altri_pericoli', 'lavori'] },
@@ -20,6 +21,7 @@ const GROUPS: { title: string; ids: SignId[] }[] = [
 
 /** Dizionario illustrato dei segnali. */
 export default function SignsScreen() {
+  useOpenSound();
   const styles = useStyles();
   return (
     <SafeAreaView style={styles.root}>

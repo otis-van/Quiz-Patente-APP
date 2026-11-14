@@ -10,7 +10,7 @@ import { RoadSign } from '@/components/RoadSign';
 import { chapterById } from '@/data/chapters';
 import { Question } from '@/data/questions';
 import { haptic } from '@/lib/haptics';
-import { playSound } from '@/lib/sounds';
+import { playSound, useOpenSound } from '@/lib/sounds';
 import { buildExam, EXAM_MAX_ERRORS, EXAM_SECONDS } from '@/lib/quiz';
 import { useProgress } from '@/store/progress';
 import { boxed, F, hardShadow, MAX_WIDTH, makeStyles, useColors } from '@/theme';
@@ -29,6 +29,7 @@ function confirm(title: string, message: string, onOk: () => void) {
 }
 
 export default function ExamSession() {
+  useOpenSound();
   const C = useColors();
   const styles = useStyles();
   const [questions] = useState<Question[]>(buildExam);

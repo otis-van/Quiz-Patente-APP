@@ -9,8 +9,10 @@ import { RetroButton } from '@/components/RetroButton';
 import { Window } from '@/components/Window';
 import { useAuth } from '@/store/auth';
 import { F, makeStyles, useColors } from '@/theme';
+import { useOpenSound } from '@/lib/sounds';
 
 export default function AuthScreen() {
+  useOpenSound();
   const C = useColors();
   const styles = useStyles();
   const params = useLocalSearchParams<{ mode?: 'signin' | 'signup' }>();

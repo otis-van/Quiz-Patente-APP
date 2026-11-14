@@ -3,6 +3,7 @@ import { View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Icon, IconName } from '@/components/Icon';
+import { playSound } from '@/lib/sounds';
 import { F, makeStyles, useColors } from '@/theme';
 
 function TabIcon({ icon, focused }: { icon: IconName; focused: boolean }) {
@@ -23,6 +24,7 @@ export default function TabsLayout() {
   });
   return (
     <Tabs
+      screenListeners={{ tabPress: () => playSound('tab') }}
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: C.text,

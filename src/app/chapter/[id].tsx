@@ -11,9 +11,11 @@ import { chapterById } from '@/data/chapters';
 import { questionsOfChapter } from '@/data/questions';
 import { chapterMastery, mastery, useProgress } from '@/store/progress';
 import { boxed, F, MAX_WIDTH, makeStyles, useColors } from '@/theme';
+import { useOpenSound } from '@/lib/sounds';
 
 /** Guida dell'argomento: tutte le domande con risposta e il tuo livello di padronanza. */
 export default function ChapterScreen() {
+  useOpenSound();
   const C = useColors();
   const styles = useStyles();
   const { id } = useLocalSearchParams<{ id: string }>();
