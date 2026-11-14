@@ -6,7 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { GridBackground } from '@/components/GridBackground';
 import { Icon } from '@/components/Icon';
 import { RetroButton } from '@/components/RetroButton';
-import { RoadSign } from '@/components/RoadSign';
+import { hasImage, QuestionImage } from '@/components/QuestionImage';
 import { FooterBar } from '@/components/FooterBar';
 import { chapterById } from '@/data/chapters';
 import { Question } from '@/data/questions';
@@ -133,9 +133,9 @@ export default function ExamSession() {
             <Icon name={ch.icon} size={16} />
             <Text style={styles.kicker}>{ch.short.toUpperCase()}</Text>
           </View>
-          {q.sign && (
+          {hasImage(q) && (
             <View style={styles.signCard}>
-              <RoadSign id={q.sign} size={150} />
+              <QuestionImage q={q} size={150} />
             </View>
           )}
           <Text style={styles.question}>{q.text}</Text>
@@ -230,7 +230,7 @@ function ExamResult({ questions, answers }: { questions: Question[]; answers: (b
                     <Text style={styles.wrongChapter}>{chapterById(q.chapter).short.toUpperCase()}</Text>
                   </View>
                   <View style={{ flexDirection: 'row', gap: 10, alignItems: 'center' }}>
-                    {q.sign && <RoadSign id={q.sign} size={56} />}
+                    {hasImage(q) && <QuestionImage q={q} size={56} />}
                     <Text style={[styles.wrongText, { flex: 1 }]}>{q.text}</Text>
                   </View>
                   <Text style={styles.wrongAnswer}>

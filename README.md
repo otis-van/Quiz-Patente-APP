@@ -116,4 +116,6 @@ npx eslint src     # lint
 
 ## Crediti
 
+- Domande e figure: listato patenti A e B di Edizioni Neca (aggiornato al 09/11/2026), **solo per uso privato**: prima di pubblicare l'app leggi [PUBBLICAZIONE.md](PUBBLICAZIONE.md).
+
 - Immagini ufficiali dei segnali stradali: [Wikimedia Commons](https://commons.wikimedia.org/wiki/Category:SVG_road_signs_in_Italy) (pubblico dominio). Dove manca l'immagine ufficiale si usa un disegno SVG (`src/components/RoadSign.tsx`).

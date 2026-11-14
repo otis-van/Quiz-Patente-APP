@@ -1,12 +1,12 @@
 import { router, useLocalSearchParams } from 'expo-router';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { FlatList, Pressable, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { GridBackground } from '@/components/GridBackground';
 import { Icon } from '@/components/Icon';
 import { ProgressBar } from '@/components/ProgressBar';
 import { RetroButton } from '@/components/RetroButton';
-import { RoadSign } from '@/components/RoadSign';
+import { hasImage, QuestionImage } from '@/components/QuestionImage';
 import { FooterBar } from '@/components/FooterBar';
 import { chapterById } from '@/data/chapters';
 import { questionsOfChapter } from '@/data/questions';
@@ -51,27 +51,33 @@ export default function ChapterScreen() {
           </View>
         </View>
       </View>
-      <ScrollView>
-        <View style={[styles.inner, { padding: 16, gap: 10 }]}>
-          <Text style={styles.section}>Guida · {questions.length} domande</Text>
-          {questions.map((q) => {
-            const st = stats[q.id];
-            const m = mastery(st);
-            const badge = !st ? C.surfaceAlt : m >= 1 ? C.green : st.s === 0 ? C.red : C.yellow;
-            return (
-              <View key={q.id} style={styles.card}>
-                <View style={{ flexDirection: 'row', gap: 10 }}>
-                  <View style={[styles.dot, { backgroundColor: badge }]} />
-                  <Text style={styles.qText}>{q.text}</Text>
-                  {q.sign && <RoadSign id={q.sign} size={56} />}
-                </View>
-                <Text style={[styles.answer, { color: q.answer ? C.greenText : C.redText }]}>
-                  {q.answer ? 'VERO' : 'FALSO'}
-                </Text>
-                {q.explanation && <Text style={styles.expl}>{q.explanation}</Text>}
+      <FlatList
+        data={questions}
+        keyExtractor={(q) => q.id}
+        initialNumToRender={12}
+        windowSize={7}
+        contentContainerStyle={[styles.inner, { padding: 16 }]}
+        ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
+        ListHeaderComponent={<Text style={[styles.section, { marginBottom: 10 }]}>Guida · {questions.length} domande</Text>}
+        renderItem={({ item: q }) => {
+          const st = stats[q.id];
+          const m = mastery(st);
+          const badge = !st ? C.surfaceAlt : m >= 1 ? C.green : st.s === 0 ? C.red : C.yellow;
+          return (
+            <View style={styles.card}>
+              <View style={{ flexDirection: 'row', gap: 10 }}>
+                <View style={[styles.dot, { backgroundColor: badge }]} />
+                <Text style={styles.qText}>{q.text}</Text>
+                {hasImage(q) && <QuestionImage q={q} size={56} />}
               </View>
-            );
-          })}
+              <Text style={[styles.answer, { color: q.answer ? C.greenText : C.redText }]}>
+                {q.answer ? 'VERO' : 'FALSO'}
+              </Text>
+              {q.explanation && <Text style={styles.expl}>{q.explanation}</Text>}
+            </View>
+          );
+        }}
+        ListFooterComponent={
           <View style={styles.legendRow}>
             {[
               [C.surfaceAlt, 'mai vista'],
@@ -85,8 +91,8 @@ export default function ChapterScreen() {
               </View>
             ))}
           </View>
-        </View>
-      </ScrollView>
+        }
+      />
       <FooterBar>
         <RetroButton
           title="Esercitati"

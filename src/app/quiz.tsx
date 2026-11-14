@@ -7,7 +7,7 @@ import { GridBackground } from '@/components/GridBackground';
 import { Icon, IconName } from '@/components/Icon';
 import { ProgressBar } from '@/components/ProgressBar';
 import { RetroButton } from '@/components/RetroButton';
-import { RoadSign } from '@/components/RoadSign';
+import { hasImage, QuestionImage } from '@/components/QuestionImage';
 import { FooterBar } from '@/components/FooterBar';
 import { chapterById } from '@/data/chapters';
 import { Question } from '@/data/questions';
@@ -171,9 +171,9 @@ export default function QuizScreen() {
               </Text>
             </View>
           )}
-          {current.q.sign && (
+          {hasImage(current.q) && (
             <View style={styles.signCard}>
-              <RoadSign id={current.q.sign} size={150} />
+              <QuestionImage q={current.q} size={150} />
             </View>
           )}
           <View style={styles.questionRow}>
