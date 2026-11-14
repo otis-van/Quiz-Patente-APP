@@ -13,7 +13,7 @@ import { haptic } from '@/lib/haptics';
 import { playSound, useOpenSound } from '@/lib/sounds';
 import { buildExam, EXAM_MAX_ERRORS, EXAM_SECONDS } from '@/lib/quiz';
 import { useProgress } from '@/store/progress';
-import { boxed, F, hardShadow, MAX_WIDTH, makeStyles, useColors } from '@/theme';
+import { boxed, F, hardShadow, pressIn, MAX_WIDTH, makeStyles, useColors } from '@/theme';
 
 const fmt = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 
@@ -148,7 +148,7 @@ export default function ExamSession() {
                       style={[
                         styles.vf,
                         sel && { backgroundColor: C.yellow },
-                        pressed || sel ? { transform: [{ translateX: 4 }, { translateY: 4 }] } : hardShadow(C, 4),
+                        pressed || sel ? pressIn(4) : hardShadow(C, 4),
                       ]}>
                       <Text style={[styles.vfLetter, sel && { color: C.onAccent }]}>{val ? 'V' : 'F'}</Text>
                       <Text style={[styles.vfLabel, sel && { color: C.onAccent }]}>{val ? 'VERO' : 'FALSO'}</Text>

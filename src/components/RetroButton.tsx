@@ -2,7 +2,7 @@ import { Pressable, StyleProp, Text, View, ViewStyle } from 'react-native';
 
 import { haptic } from '@/lib/haptics';
 import { playSound } from '@/lib/sounds';
-import { F, hardShadow, makeStyles, Palette, RADIUS, useColors } from '@/theme';
+import { F, hardShadow, pressIn, makeStyles, Palette, RADIUS, useColors } from '@/theme';
 
 export type Variant = 'yellow' | 'lime' | 'lilac' | 'blue' | 'pink' | 'mint' | 'green' | 'red' | 'surface' | 'ghost';
 
@@ -46,7 +46,7 @@ export function RetroButton({ title, onPress, variant = 'yellow', disabled, styl
                 ? styles.disabled
                 : [
                     { backgroundColor: fill(C, variant) },
-                    pressed ? { transform: [{ translateX: shadow }, { translateY: shadow }] } : hardShadow(C, shadow),
+                    pressed ? pressIn(shadow) : hardShadow(C, shadow),
                   ],
           ]}>
           {icon}

@@ -14,7 +14,7 @@ import { haptic } from '@/lib/haptics';
 import { playSound, useOpenSound } from '@/lib/sounds';
 import { buildDaily, buildLesson, buildPractice, buildReview, QuizMode, xpForSession } from '@/lib/quiz';
 import { AnswerLog, mistakeIds, useProgress } from '@/store/progress';
-import { boxed, F, hardShadow, MAX_WIDTH, makeStyles, useColors } from '@/theme';
+import { boxed, F, hardShadow, pressIn, MAX_WIDTH, makeStyles, useColors } from '@/theme';
 
 const PRAISE = ['Ottimo!', 'Perfetto!', 'Bravissimo!', 'Esatto!', 'Grande!', 'Continua così!'];
 
@@ -244,7 +244,7 @@ function Choice({
           style={[
             styles.choice,
             { backgroundColor: bg },
-            pressed || down ? { transform: [{ translateX: 4 }, { translateY: 4 }] } : hardShadow(C, 4),
+            pressed || down ? pressIn(4) : hardShadow(C, 4),
           ]}>
           <Icon name={icon} size={30} />
           <Text style={[styles.choiceText, { color: fg }]}>{label}</Text>

@@ -13,7 +13,7 @@ import { CHAPTERS } from '@/data/chapters';
 import { dayKey } from '@/lib/date';
 import { DAILY_SIZE } from '@/lib/quiz';
 import { mistakeIds, todayXp, useProgress } from '@/store/progress';
-import { boxed, F, makeStyles, useColors } from '@/theme';
+import { boxed, F, pressIn, makeStyles, useColors } from '@/theme';
 
 const EMPTY: number[] = [];
 
@@ -161,7 +161,7 @@ const useStyles = makeStyles((C) => ({
   quickRow: { flexDirection: 'row', gap: 14, marginTop: 18 },
   quick: { ...boxed(C), padding: 14, gap: 6, minHeight: 140 },
   onAccent: { color: C.onAccent },
-  pressed: { transform: [{ translateX: 4 }, { translateY: 4 }], boxShadow: 'none' },
+  pressed: pressIn(4),
   signsCard: { ...boxed(C), backgroundColor: C.surface, flexDirection: 'row', alignItems: 'center', gap: 12, padding: 12 },
   signBox: {
     width: 56,

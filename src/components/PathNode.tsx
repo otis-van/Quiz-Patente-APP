@@ -3,7 +3,7 @@ import { Pressable, Text, View } from 'react-native';
 import { Icon, IconName } from '@/components/Icon';
 import { haptic } from '@/lib/haptics';
 import { playSound } from '@/lib/sounds';
-import { F, hardShadow, makeStyles, useColors } from '@/theme';
+import { F, hardShadow, pressIn, makeStyles, useColors } from '@/theme';
 
 export type NodeState = 'done' | 'current' | 'locked';
 
@@ -43,7 +43,7 @@ export function PathNode({ state, color, icon, offset, onPress, label }: Props) 
               styles.node,
               { backgroundColor: bg },
               state === 'locked' && styles.locked,
-              state !== 'locked' && (pressed ? { transform: [{ translateX: 5 }, { translateY: 5 }] } : hardShadow(C, 5)),
+              state !== 'locked' && (pressed ? pressIn(5) : hardShadow(C, 5)),
             ]}>
             <Icon name={icon} size={36} dim={state === 'locked'} />
           </View>

@@ -4,7 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Icon, IconName } from '@/components/Icon';
 import { playSound } from '@/lib/sounds';
-import { F, makeStyles, useColors } from '@/theme';
+import { F, hardShadow, makeStyles, useColors } from '@/theme';
 
 function TabIcon({ icon, focused }: { icon: IconName; focused: boolean }) {
   const styles = useStyles();
@@ -57,5 +57,5 @@ const useStyles = makeStyles((C) => ({
     borderWidth: 2,
     borderColor: 'transparent',
   },
-  iconFocused: { backgroundColor: C.yellow, borderColor: C.ink, boxShadow: `2px 2px 0px ${C.ink}` },
+  iconFocused: { backgroundColor: C.yellow, borderColor: C.ink, ...hardShadow(C, 3) },
 }));

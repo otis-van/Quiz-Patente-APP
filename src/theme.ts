@@ -29,6 +29,7 @@ const light = {
   surface: '#FFFBF2',
   surfaceAlt: '#F6E8CD',
   ink: '#1B1B1F',
+  shadow: 'rgba(27, 27, 31, 0.28)',
   text: '#1B1B1F',
   textLight: '#5F5648',
   muted: '#968A78',
@@ -46,6 +47,7 @@ const dark: Palette = {
   surface: '#3C3C43',
   surfaceAlt: '#4A4A52',
   ink: '#0F0F12',
+  shadow: 'rgba(0, 0, 0, 0.45)',
   text: '#F7EFDF',
   textLight: '#CFC6B6',
   muted: '#9A958D',
@@ -76,8 +78,20 @@ export function makeStyles<S extends Styles>(factory: (c: Palette) => S & Styles
   };
 }
 
-/** Ombra netta, senza sfocatura, spostata in basso a destra. */
-export const hardShadow = (c: Palette, size = 4) => ({ boxShadow: `${size}px ${size}px 0px ${c.ink}` });
+/** Spostamento reale dell'ombra (più contenuto rispetto al valore "nominale"). */
+const shadowPx = (size: number) => Math.max(2, Math.round(size * 0.55));
+
+/** Ombra netta e morbida: senza sfocatura, spostata in basso a destra, semitrasparente. */
+export const hardShadow = (c: Palette, size = 4) => {
+  const s = shadowPx(size);
+  return { boxShadow: `${s}px ${s}px 0px ${c.shadow}` };
+};
+
+/** Spostamento del riquadro quando viene premuto (copre l'ombra). */
+export const pressIn = (size = 4) => {
+  const s = shadowPx(size);
+  return { transform: [{ translateX: s }, { translateY: s }], boxShadow: 'none' };
+};
 
 /** Bordo + ombra standard dei riquadri. */
 export const boxed = (c: Palette, size = 4) => ({

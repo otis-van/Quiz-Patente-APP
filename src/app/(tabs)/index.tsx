@@ -12,7 +12,7 @@ import { Window } from '@/components/Window';
 import { Chapter, CHAPTERS, LESSONS_PER_CHAPTER } from '@/data/chapters';
 import { questionsOfChapter } from '@/data/questions';
 import { chapterMastery, useProgress } from '@/store/progress';
-import { boxed, F, makeStyles, useColors } from '@/theme';
+import { boxed, F, hardShadow, pressIn, makeStyles, useColors } from '@/theme';
 
 const OFFSETS = [0, 48, 72, 48, 0, -48, -72, -48];
 
@@ -126,7 +126,7 @@ const useStyles = makeStyles((C) => ({
   continueTitle: { fontFamily: F.black, color: C.text, fontSize: 17 },
   unit: { marginTop: 28 },
   banner: { ...boxed(C), padding: 14, flexDirection: 'row', alignItems: 'center', gap: 12 },
-  pressed: { transform: [{ translateX: 4 }, { translateY: 4 }], boxShadow: 'none' },
+  pressed: pressIn(4),
   bannerIcon: {
     width: 50,
     height: 50,
@@ -150,7 +150,7 @@ const useStyles = makeStyles((C) => ({
     backgroundColor: C.white,
     alignItems: 'center',
     justifyContent: 'center',
-    boxShadow: `2px 2px 0px ${C.ink}`,
+    ...hardShadow(C, 3),
   },
   path: { alignItems: 'center', paddingVertical: 14 },
 }));

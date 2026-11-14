@@ -10,7 +10,7 @@ import { RoadSign } from '@/components/RoadSign';
 import { chapterById } from '@/data/chapters';
 import { questionsOfChapter } from '@/data/questions';
 import { chapterMastery, mastery, useProgress } from '@/store/progress';
-import { boxed, F, MAX_WIDTH, makeStyles, useColors } from '@/theme';
+import { boxed, F, hardShadow, MAX_WIDTH, makeStyles, useColors } from '@/theme';
 import { useOpenSound } from '@/lib/sounds';
 
 /** Guida dell'argomento: tutte le domande con risposta e il tuo livello di padronanza. */
@@ -113,7 +113,7 @@ const useStyles = makeStyles((C) => ({
     backgroundColor: C.white,
     alignItems: 'center',
     justifyContent: 'center',
-    boxShadow: `3px 3px 0px ${C.ink}`,
+    ...hardShadow(C, 3),
   },
   kicker: { fontFamily: F.pixel, color: C.onAccent, fontSize: 12 },
   title: { fontFamily: F.black, color: C.onAccent, fontSize: 20, marginTop: 2, lineHeight: 26 },
