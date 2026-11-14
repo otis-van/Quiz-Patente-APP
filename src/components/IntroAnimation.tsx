@@ -319,7 +319,10 @@ export function IntroAnimation({ onDone }: { onDone: () => void }) {
               </View>
             </View>
             <View style={styles.body}>
-              <Image source={LOGO} style={{ width: winW - 48, height: (winW - 48) * (307 / 1169), alignSelf: 'center' }} resizeMode="contain" />
+              <View style={{ alignItems: 'center', gap: 4 }}>
+                <Image source={LOGO} style={{ width: winW - 48, height: (winW - 48) * (307 / 1169) }} resizeMode="contain" />
+                <Text style={styles.subtitle}>QUIZ PATENTE B</Text>
+              </View>
               {variant.trafficLight ? (
                 <TrafficLight t={t} />
               ) : (
@@ -426,6 +429,7 @@ const useStyles = makeStyles((C) => ({
   max: { width: 8, height: 7, borderWidth: 1.5, borderColor: C.ink },
   x: { fontFamily: F.bold, fontSize: 13, lineHeight: 14, color: C.ink },
   body: { padding: 16, gap: 14 },
+  subtitle: { fontFamily: F.black, fontSize: 18, color: '#FF6B6B', letterSpacing: 2 },
   logoRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10 },
   logo: { fontFamily: F.black, fontSize: 30, color: C.text, letterSpacing: -0.5 },
   progress: {
