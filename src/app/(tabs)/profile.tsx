@@ -180,6 +180,7 @@ export default function ProfileScreen() {
 
       <Text style={styles.section}>Aspetto</Text>
       <ThemeSettings />
+      <IntroSetting />
 
       <RetroButton
         title="Azzera progressi"
@@ -221,6 +222,30 @@ function ThemeSettings() {
         </Pressable>
       ))}
     </View>
+  );
+}
+
+function IntroSetting() {
+  const C = useColors();
+  const styles = useStyles();
+  const on = useSettings((s) => s.introEnabled);
+  return (
+    <Window title="intro.exe" color={C.pink} style={styles.mt}>
+      <View style={styles.switchRow}>
+        <PixelIcon name="car" size={28} />
+        <View style={{ flex: 1 }}>
+          <Text style={styles.cardTitle}>Animazione all’apertura</Text>
+          <Text style={styles.cardText}>Una scena diversa con un’auto ogni volta che apri l’app.</Text>
+        </View>
+        <Switch
+          value={on}
+          onValueChange={(v) => useSettings.getState().setIntroEnabled(v)}
+          trackColor={{ true: C.green, false: C.surfaceAlt }}
+          thumbColor={C.white}
+          ios_backgroundColor={C.surfaceAlt}
+        />
+      </View>
+    </Window>
   );
 }
 

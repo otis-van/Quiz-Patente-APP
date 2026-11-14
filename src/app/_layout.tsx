@@ -5,12 +5,14 @@ import { useFonts } from 'expo-font';
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import { IntroAnimation } from '@/components/IntroAnimation';
 import { startReminderScheduler } from '@/lib/reminders';
 import { startAutoSync } from '@/lib/sync';
 import { useAuth } from '@/store/auth';
+import { useSettings, useSettingsHydrated } from '@/store/settings';
 import { useColors } from '@/theme';
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
@@ -26,6 +28,11 @@ export default function RootLayout() {
     Silkscreen_700Bold,
   });
 
+  const hydrated = useSettingsHydrated();
+  const introEnabled = useSettings((s) => s.introEnabled);
+  const [introDone, setIntroDone] = useState(false);
+  const finishIntro = useCallback(() => setIntroDone(true), []);
+
   useEffect(() => {
     const stopAuth = useAuth.getState().init();
     const stopSync = startAutoSync();
@@ -37,7 +44,7 @@ export default function RootLayout() {
     };
   }, []);
 
-  const ready = fontsLoaded || !!fontError;
+  const ready = (fontsLoaded || !!fontError) && hydrated;
   useEffect(() => {
     if (ready) SplashScreen.hideAsync().catch(() => {});
   }, [ready]);
@@ -62,6 +69,7 @@ export default function RootLayout() {
           <Stack.Screen name="chapter/[id]" />
           <Stack.Screen name="signs" />
         </Stack>
+        {introEnabled && !introDone && <IntroAnimation onDone={finishIntro} />}
       </ThemeProvider>
     </SafeAreaProvider>
   );

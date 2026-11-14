@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useSyncExternalStore } from 'react';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
@@ -10,6 +11,9 @@ interface SettingsState {
   reminderEnabled: boolean;
   reminderHour: number;
   reminderMinute: number;
+  /** Animazione con l'auto all'apertura dell'app. */
+  introEnabled: boolean;
+  setIntroEnabled: (on: boolean) => void;
   setThemeMode: (m: ThemeMode) => void;
   setReminder: (r: Partial<Pick<SettingsState, 'reminderEnabled' | 'reminderHour' | 'reminderMinute'>>) => void;
 }
@@ -21,9 +25,20 @@ export const useSettings = create<SettingsState>()(
       reminderEnabled: false,
       reminderHour: 19,
       reminderMinute: 0,
+      introEnabled: true,
+      setIntroEnabled: (introEnabled) => set({ introEnabled }),
       setThemeMode: (themeMode) => set({ themeMode }),
       setReminder: (r) => set(r),
     }),
     { name: 'quiz-patente-settings', storage: createJSONStorage(() => AsyncStorage) },
   ),
 );
+
+/** true quando le preferenze salvate sono state caricate dal dispositivo. */
+export function useSettingsHydrated() {
+  return useSyncExternalStore(
+    (cb) => useSettings.persist.onFinishHydration(cb),
+    () => useSettings.persist.hasHydrated(),
+    () => false,
+  );
+}
