@@ -113,3 +113,7 @@ supabase/migrations/ schema del database
 npx tsc --noEmit   # controllo dei tipi
 npx eslint src     # lint
 ```
+
+## Crediti
+
+- Immagini ufficiali dei segnali stradali: [Wikimedia Commons](https://commons.wikimedia.org/wiki/Category:SVG_road_signs_in_Italy) (pubblico dominio). Dove manca l'immagine ufficiale si usa un disegno SVG (`src/components/RoadSign.tsx`).

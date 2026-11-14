@@ -1,9 +1,11 @@
 /**
  * Segnali stradali disegnati in SVG (sistema di coordinate 100×100).
- * Sono riproduzioni stilizzate dei segnali del Codice della Strada, pensate per l'esercitazione.
+ * Dove disponibile si usa l'immagine ufficiale del segnale (Wikimedia Commons, pubblico dominio,
+ * vedi src/data/officialSigns.ts); per gli altri restano queste riproduzioni stilizzate.
  */
 import type { ReactNode } from 'react';
-import { Platform } from 'react-native';
+import { Image, Platform } from 'react-native';
+import { OFFICIAL_SIGNS } from '@/data/officialSigns';
 import Svg, { Circle, G, Line, Path, Polygon, Rect, Text as RawSvgText } from 'react-native-svg';
 
 const RED = '#D7262E';
@@ -531,6 +533,18 @@ export type SignId = keyof typeof SIGNS;
 export function RoadSign({ id, size = 120 }: { id: SignId; size?: number }) {
   const sign = SIGNS[id];
   if (!sign) return null;
+  // Immagine ufficiale (Wikimedia Commons) quando disponibile, altrimenti il disegno SVG.
+  const official = OFFICIAL_SIGNS[id];
+  if (official) {
+    return (
+      <Image
+        source={official}
+        style={{ width: size, height: size }}
+        resizeMode="contain"
+        accessibilityLabel={`Segnale: ${sign.name}`}
+      />
+    );
+  }
   return (
     <Svg width={size} height={size} viewBox="0 0 100 100" accessibilityLabel={`Segnale: ${sign.name}`}>
       {sign.draw()}

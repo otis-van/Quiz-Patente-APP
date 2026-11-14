@@ -40,15 +40,25 @@ export function buildPractice(stats: Record<string, QuestionStat>): Question[] {
 }
 
 /** Simulazione d'esame: 30 domande, almeno una per ciascuno dei 25 argomenti. */
+/**
+ * Scheda d'esame come quella ministeriale: 30 domande Vero/Falso, 20 minuti, massimo 3 errori.
+ * Ogni argomento del programma ha 1 o 2 domande: una per ciascuno dei 25 argomenti,
+ * più 5 domande su 5 argomenti diversi scelti a caso. Le domande sono in ordine di argomento.
+ */
 export function buildExam(): Question[] {
   const picked: Question[] = [];
+  const pools = new Map<number, Question[]>();
   for (const ch of CHAPTERS) {
-    const [q] = shuffle(questionsOfChapter(ch.id));
-    if (q) picked.push(q);
+    const pool = shuffle(questionsOfChapter(ch.id));
+    pools.set(ch.id, pool);
+    if (pool[0]) picked.push(pool[0]);
   }
-  const used = new Set(picked.map((q) => q.id));
-  const extra = shuffle(QUESTIONS.filter((q) => !used.has(q.id))).slice(0, EXAM_QUESTIONS - picked.length);
-  return [...picked, ...extra].sort((a, b) => a.chapter - b.chapter).slice(0, EXAM_QUESTIONS);
+  const doubles = shuffle(CHAPTERS.filter((ch) => (pools.get(ch.id)?.length ?? 0) >= 2));
+  for (const ch of doubles) {
+    if (picked.length >= EXAM_QUESTIONS) break;
+    picked.push(pools.get(ch.id)![1]);
+  }
+  return picked.sort((a, b) => a.chapter - b.chapter).slice(0, EXAM_QUESTIONS);
 }
 
 export const xpForSession = (correct: number, total: number) =>
