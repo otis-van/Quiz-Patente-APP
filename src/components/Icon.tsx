@@ -145,6 +145,17 @@ const ICONS = {
     { d: circle(7, 16.6, 2.4), f: 'dark' },
     { d: circle(17, 16.6, 2.4), f: 'dark' },
   ] },
+  panda: { shapes: [
+    { d: 'M2 15.6 V10.8 Q2 9.8 3.1 9.6 L6.6 9.2 L8.6 4.6 Q8.9 4 9.6 4 H20.6 Q21.8 4 21.8 5.2 V15.6 Z', f: 'red', w: 1.3 },
+    { d: 'M9.3 5.4 H13.4 V9 H7.7 Z M14.5 5.4 H17.4 V9 H14.5 Z M18.5 5.4 H20.4 V9 H18.5 Z', f: 'blue', w: 1.1 },
+    { d: 'M2 13.6 H21.8 V15.6 H2 Z', f: 'dark', w: 1.1 },
+    { d: 'M14 9 V13.6', w: 1 },
+    { d: 'M2.1 10.4 H3.9 V11.8 H2.1 Z', f: 'yellow', w: 0.9 },
+    { d: circle(6.3, 16.2, 2.3), f: 'dark' },
+    { d: circle(6.3, 16.2, 0.9), f: 'light', w: 0.9 },
+    { d: circle(17.6, 16.2, 2.3), f: 'dark' },
+    { d: circle(17.6, 16.2, 0.9), f: 'light', w: 0.9 },
+  ] },
   cap: { shapes: [
     { d: 'M6 11 V15.5 Q12 19.2 18 15.5 V11', f: 'lilac' },
     { d: 'M2 9 L12 4.5 L22 9 L12 13.5 Z', f: 'lilac' },

@@ -28,7 +28,7 @@ export default function PathScreen() {
         <StatsBar
           left={
             <View style={styles.brandRow}>
-              <Icon name="car" size={26} />
+              <Icon name="panda" size={38} />
               <Text style={styles.brand}>PATENTE.B</Text>
             </View>
           }

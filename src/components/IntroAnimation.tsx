@@ -280,7 +280,7 @@ export function IntroAnimation({ onDone }: { onDone: () => void }) {
             </View>
             <View style={styles.body}>
               <View style={styles.logoRow}>
-                <Icon name="car" size={40} />
+                <Icon name="panda" size={46} />
                 <Text style={styles.logo}>PATENTE.B</Text>
               </View>
               {variant.trafficLight ? (
