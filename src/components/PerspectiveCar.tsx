@@ -163,7 +163,7 @@ function wheels(W: number, ys: number[], z: number, r: number): Shape[] {
 /** Utilitaria squadrata anni '80: tutta spigoli smussati, plastica grigia in basso. */
 const BOXY: Model = (() => {
   const W = 1.5;
-  const L = 3.45;
+  const L = 3.25;
   const zb = 0.3;
   const bodyProf = roundPoly(
     [
@@ -223,7 +223,7 @@ const BOXY: Model = (() => {
       for (const z of [0.64, 0.68, 0.72]) s.push({ d: line([[0.55, L + 0.012, z], [W - 0.55, L + 0.012, z]]), fill: 'none', stroke: '#8A857E', sw: 0.5 });
       s.push({ d: quadFront(L + 0.03, 0.5, W - 0.5, 0.33, 0.43), fill: '#FFD54A', stroke: INK, sw: 0.6 });
       s.push({ d: toPath([[W, 2.42, 0.86], [W + 0.16, 2.4, 0.9], [W + 0.16, 2.52, 0.96], [W, 2.52, 0.91]]), fill: DARK_PLASTIC, stroke: INK, sw: 0.8 });
-      s.push(...wheels(W, [0.6, 2.82], zb + 0.02, 0.29));
+      s.push(...wheels(W, [0.6, 2.7], zb + 0.02, 0.29));
       return s;
     },
   };

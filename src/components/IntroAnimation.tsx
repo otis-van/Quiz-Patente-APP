@@ -74,6 +74,17 @@ function wave(t: V, n: number, a: number, b: number) {
   return t.interpolate({ inputRange, outputRange });
 }
 
+/** Dente di sega: va da `from` a `to` e riparte, `cycles` volte. */
+function saw(t: V, cycles: number, from: number, to: number) {
+  const inputRange: number[] = [];
+  const outputRange: number[] = [];
+  for (let k = 0; k < cycles; k++) {
+    inputRange.push(k / cycles + (k ? 0.0001 : 0), (k + 1) / cycles);
+    outputRange.push(from, to);
+  }
+  return t.interpolate({ inputRange, outputRange });
+}
+
 const popIn = (t: V, at: number, len = 0.08) => ({
   opacity: lerp(t, [at, at + 0.02], [0, 1]),
   scale: lerp(t, [at, at + len * 0.6, at + len], [0.3, 1.15, 1]),
@@ -141,7 +152,7 @@ export function IntroAnimation({ onDone }: { onDone: () => void }) {
   const cw = Math.min(W * (look.model === 'bubble' ? 0.6 : 0.64), 300);
   const ch = cw * carAspect(look.model);
   const D = Math.hypot(W, H) * 0.75;
-  const TS = [0.06, 0.42, 0.62, 0.96];
+  const TS = [0.02, 0.3, 0.6, 0.92];
   const SS = [-D, -cw * 0.08, cw * 0.08, D];
   const s = lerp(t, TS, SS);
   const carX = Animated.add(cx - cw / 2, Animated.multiply(s, DIR.x));
@@ -186,6 +197,8 @@ export function IntroAnimation({ onDone }: { onDone: () => void }) {
           const len = l.len * cw;
           const ax = -DIR.x * cw * l.off + NRM.x * l.n * ch;
           const ay = -DIR.y * cw * l.off + NRM.y * l.n * ch;
+          // le linee "sfrecciano" all'indietro e ricompaiono, ognuna con il suo ritmo
+          const slide = saw(t, 9 + i, 0, cw * 0.35);
           return (
             <Animated.View
               key={i}
@@ -193,10 +206,10 @@ export function IntroAnimation({ onDone }: { onDone: () => void }) {
                 position: 'absolute',
                 left: 0,
                 top: 0,
-                opacity: lerp(t, [0.08, 0.14, 0.42, 0.5, 0.62, 0.68, 0.94, 1], [0, 1, 1, 0.6, 0.6, 1, 1, 0]),
+                opacity: lerp(t, [0.04, 0.1, 0.3, 0.36, 0.56, 0.62, 0.86, 0.92], [0, 1, 1, 0.6, 0.6, 1, 1, 0]),
                 transform: [
-                  { translateX: Animated.add(carX, cw / 2 + ax) },
-                  { translateY: Animated.add(carY, ch * 0.55 + ay) },
+                  { translateX: Animated.add(Animated.add(carX, cw / 2 + ax), Animated.multiply(slide, -DIR.x)) },
+                  { translateY: Animated.add(Animated.add(carY, ch * 0.55 + ay), Animated.multiply(slide, -DIR.y)) },
                 ],
               }}>
               <Svg width={len * COS30 + 4} height={len * SIN30 + 4} style={{ position: 'absolute', left: -2, top: -len * SIN30 - 2 }}>
