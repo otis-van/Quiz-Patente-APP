@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { Animated, Easing, Image, Platform, Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
-import { CarModel, carAspect, PerspectiveCar } from '@/components/PerspectiveCar';
 import { playSound, stopSound } from '@/lib/sounds';
 import { useSettings } from '@/store/settings';
 import { F, hardShadow, makeStyles, Palette, useColors } from '@/theme';
@@ -34,19 +33,21 @@ const VARIANTS: Variant[] = [
   { file: 'semaforo.exe', bar: (c) => c.pink, loading: 'Attendere il verde…', trafficLight: true },
 ];
 
-const CAR_COLORS: [string, string][] = [
-  ['green', '#3DAA5C'],
-  ['blue', '#7FB2F0'],
-  ['red', '#F0554A'],
-  ['yellow', '#FFC93C'],
-  ['lilac', '#A78BFA'],
-  ['pink', '#FF7FBF'],
-  ['teal', '#2EC4B6'],
-  ['orange', '#FF8A3D'],
-  ['cream', '#F2E6C9'],
-];
-
-const MODELS: CarModel[] = ['boxy', 'bubble'];
+/** Le due auto dell'illustrazione, in più colori: ogni apertura una combinazione diversa. */
+const PANDA = {
+  verde: require('../../assets/intro/panda-verde.png'),
+  rossa: require('../../assets/intro/panda-rossa.png'),
+  gialla: require('../../assets/intro/panda-gialla.png'),
+  lilla: require('../../assets/intro/panda-lilla.png'),
+};
+const MINI = {
+  azzurra: require('../../assets/intro/mini-azzurra.png'),
+  rossa: require('../../assets/intro/mini-rossa.png'),
+  gialla: require('../../assets/intro/mini-gialla.png'),
+  menta: require('../../assets/intro/mini-menta.png'),
+};
+const PANDA_ASPECT = 882 / 1193;
+const MINI_ASPECT = 884 / 1113;
 const GRAIN = require('../../assets/images/grain.png');
 const LOGO = require('../../assets/images/logo.png');
 
@@ -109,11 +110,11 @@ export function IntroAnimation({ onDone }: { onDone: () => void }) {
     const forced = Platform.OS === 'web' ? Number(new URLSearchParams(globalThis.location?.search).get('intro')) : 0;
     const variant = VARIANTS[forced >= 1 && forced <= VARIANTS.length ? forced - 1 : Math.floor(Math.random() * VARIANTS.length)];
     const q = Platform.OS === 'web' ? new URLSearchParams(globalThis.location?.search) : null;
-    const [carName, car] = pick(CAR_COLORS);
-    const bg = pick(BACKGROUNDS.filter(([name]) => name !== carName))[1];
-    const model = (MODELS as string[]).includes(q?.get('car') ?? '') ? (q!.get('car') as CarModel) : pick(MODELS);
+    const pandaKey = pick(Object.keys(PANDA)) as keyof typeof PANDA;
+    const miniKey = pick(Object.keys(MINI).filter((k) => k !== pandaKey)) as keyof typeof MINI;
+    const bg = pick(BACKGROUNDS)[1];
     const freeze = q?.get('freeze') ? Number(q.get('freeze')) : null;
-    return { variant, car: q?.get('color') ? `#${q.get('color')}` : car, bg, model, freeze };
+    return { variant, panda: PANDA[pandaKey], mini: MINI[miniKey], bg, freeze };
   });
   const { variant } = look;
   const [t] = useState(() => new Animated.Value(look.freeze ?? 0));
@@ -161,24 +162,31 @@ export function IntroAnimation({ onDone }: { onDone: () => void }) {
   const stripeW = half * 0.2;
   const stripe = `${quad(-far, half * 0.35, -stripeW - half * 0.1, stripeW - half * 0.1)} ${quad(-half * 0.35, far, -stripeW + half * 0.25, stripeW + half * 0.25)}`;
 
-  /* ---------- Auto ---------- */
-  const cw = Math.min(W * (look.model === 'bubble' ? 0.6 : 0.64), 300);
-  const ch = cw * carAspect(look.model);
-  const D = Math.hypot(W, H) * 0.75;
-  const TS = [0.02, 0.3, 0.6, 0.92];
-  const SS = [-D, -cw * 0.08, cw * 0.08, D];
-  const s = lerp(t, TS, SS);
-  const carX = Animated.add(cx - cw / 2, Animated.multiply(s, DIR.x));
-  const carY = Animated.add(cy - ch * 0.62, Animated.multiply(s, DIR.y));
-  const bounce = wave(t, 30, 0, -2.5);
+  /* ---------- Auto (due, in gara) ---------- */
+  const D = Math.hypot(W, H) * 0.8;
+  const pw = Math.min(W * 0.56, 270);
+  const mw = pw * 0.94;
+  const cars = [
+    // la Panda sulla corsia più in alto, la Mini su quella più in basso e un po' più indietro
+    { key: 'panda', src: look.panda, w: pw, h: pw * PANDA_ASPECT, n: -half * 0.42, TS: [0.02, 0.3, 0.6, 0.9], lag: 0 },
+    { key: 'mini', src: look.mini, w: mw, h: mw * MINI_ASPECT, n: half * 0.5, TS: [0.06, 0.36, 0.64, 0.96], lag: 0.12 },
+  ].map((c, i) => {
+    const s = lerp(t, c.TS, [-D, -c.w * (0.1 + c.lag), c.w * (0.06 - c.lag), D]);
+    const base = at(0, c.n);
+    return {
+      ...c,
+      x: Animated.add(base.x - c.w / 2, Animated.multiply(s, DIR.x)),
+      y: Animated.add(base.y - c.h * 0.7, Animated.multiply(s, DIR.y)),
+      bounce: wave(t, 28 + i * 4, 0, -2.5),
+    };
+  });
 
-  // Linee di velocità ("whoosh") che seguono l'auto, parallele alla strada.
+  // Linee di velocità ("whoosh") che seguono le auto, parallele alla strada.
   const whoosh = [
-    { n: -0.42, len: 0.8, off: 0.42, w: 3 },
-    { n: -0.22, len: 1.2, off: 0.5, w: 3.5 },
-    { n: -0.02, len: 0.6, off: 0.58, w: 2.5 },
-    { n: 0.18, len: 1.0, off: 0.46, w: 3 },
-    { n: 0.36, len: 0.55, off: 0.55, w: 2.5 },
+    { n: -0.36, len: 0.7, off: 0.4, w: 3 },
+    { n: -0.12, len: 1.0, off: 0.48, w: 3.5 },
+    { n: 0.12, len: 0.55, off: 0.56, w: 2.5 },
+    { n: 0.32, len: 0.85, off: 0.44, w: 3 },
   ];
   const stars = [
     { x: W * 0.12, y: H * 0.5, at: 0.3, c: '#FF7FBF' },
@@ -208,42 +216,52 @@ export function IntroAnimation({ onDone }: { onDone: () => void }) {
           <Path d={stripe} fill="#FFF1A8" />
         </Svg>
 
-        {whoosh.map((l, i) => {
-          // segmento dietro all'auto (in alto a destra), lungo la direzione di marcia
-          const len = l.len * cw;
-          const ax = -DIR.x * cw * l.off + NRM.x * l.n * ch;
-          const ay = -DIR.y * cw * l.off + NRM.y * l.n * ch;
-          // le linee "sfrecciano" all'indietro e ricompaiono, ognuna con il suo ritmo
-          const slide = saw(t, 9 + i, 0, cw * 0.35);
-          return (
-            <Animated.View
-              key={i}
+        {cars.map((car) => (
+          <View key={car.key} style={StyleSheet.absoluteFill} pointerEvents="none">
+            {whoosh.map((l, i) => {
+              const len = l.len * car.w;
+              const ax = -DIR.x * car.w * l.off + NRM.x * l.n * car.h;
+              const ay = -DIR.y * car.w * l.off + NRM.y * l.n * car.h;
+              // le linee "sfrecciano" all'indietro e ricompaiono, ognuna con il suo ritmo
+              const slide = saw(t, 9 + i, 0, car.w * 0.35);
+              return (
+                <Animated.View
+                  key={i}
+                  style={{
+                    position: 'absolute',
+                    left: 0,
+                    top: 0,
+                    opacity: lerp(t, [car.TS[0] + 0.02, car.TS[0] + 0.08, car.TS[1], car.TS[1] + 0.06, car.TS[2] - 0.04, car.TS[2] + 0.02, car.TS[3] - 0.06, car.TS[3]], [0, 1, 1, 0.6, 0.6, 1, 1, 0]),
+                    transform: [
+                      { translateX: Animated.add(Animated.add(car.x, car.w / 2 + ax), Animated.multiply(slide, -DIR.x)) },
+                      { translateY: Animated.add(Animated.add(car.y, car.h * 0.6 + ay), Animated.multiply(slide, -DIR.y)) },
+                    ],
+                  }}>
+                  <Svg width={len * COS30 + 4} height={len * SIN30 + 4} style={{ position: 'absolute', left: -2, top: -len * SIN30 - 2 }}>
+                    <Path
+                      d={`M2 ${len * SIN30 + 2} L${len * COS30 + 2} 2`}
+                      stroke={i % 2 ? '#FFFFFF' : INK}
+                      strokeWidth={l.w}
+                      strokeLinecap="round"
+                      strokeDasharray={i === 2 ? '18 10' : undefined}
+                    />
+                  </Svg>
+                </Animated.View>
+              );
+            })}
+            <Animated.Image
+              source={car.src}
               style={{
                 position: 'absolute',
                 left: 0,
                 top: 0,
-                opacity: lerp(t, [0.04, 0.1, 0.3, 0.36, 0.56, 0.62, 0.86, 0.92], [0, 1, 1, 0.6, 0.6, 1, 1, 0]),
-                transform: [
-                  { translateX: Animated.add(Animated.add(carX, cw / 2 + ax), Animated.multiply(slide, -DIR.x)) },
-                  { translateY: Animated.add(Animated.add(carY, ch * 0.55 + ay), Animated.multiply(slide, -DIR.y)) },
-                ],
-              }}>
-              <Svg width={len * COS30 + 4} height={len * SIN30 + 4} style={{ position: 'absolute', left: -2, top: -len * SIN30 - 2 }}>
-                <Path
-                  d={`M2 ${len * SIN30 + 2} L${len * COS30 + 2} 2`}
-                  stroke={i % 2 ? '#FFFFFF' : INK}
-                  strokeWidth={l.w}
-                  strokeLinecap="round"
-                  strokeDasharray={i === 2 ? '18 10' : undefined}
-                />
-              </Svg>
-            </Animated.View>
-          );
-        })}
-
-        <Animated.View style={{ position: 'absolute', left: 0, top: 0, transform: [{ translateX: carX }, { translateY: Animated.add(carY, bounce) }] }}>
-          <PerspectiveCar model={look.model} color={look.car} width={cw} />
-        </Animated.View>
+                width: car.w,
+                height: car.h,
+                transform: [{ translateX: car.x }, { translateY: Animated.add(car.y, car.bounce) }],
+              }}
+            />
+          </View>
+        ))}
 
         {stars.map((st, i) => (
           <Animated.View
